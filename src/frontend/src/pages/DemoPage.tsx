@@ -16,21 +16,63 @@ const SYMPTOM_OPTIONS = [
 ];
 
 const CAT_QUESTIONS = [
-  { id: 'cat_cough', label: 'Cough', minLabel: 'I never cough', maxLabel: 'I cough constantly' },
-  { id: 'cat_phlegm', label: 'Phlegm', minLabel: 'My chest is clear of phlegm', maxLabel: 'My chest is completely full of phlegm' },
-  { id: 'cat_chest_tightness', label: 'Chest tightness', minLabel: 'My chest does not feel tight', maxLabel: 'My chest feels extremely tight' },
-  { id: 'cat_breathlessness', label: 'Breathlessness', minLabel: 'I am not breathless walking up a hill/stairs', maxLabel: 'I am extremely breathless walking up a hill/stairs' },
-  { id: 'cat_activities', label: 'Activities at home', minLabel: 'I have no limitations with home activities', maxLabel: 'I am severely limited with home activities' },
-  { id: 'cat_confidence', label: 'Confidence leaving home', minLabel: 'I feel confident leaving my home', maxLabel: 'I am afraid to leave my home due to my breathing' },
-  { id: 'cat_sleep', label: 'Sleep', minLabel: 'I sleep soundly without breathing issues', maxLabel: 'My breathing severely disrupts my sleep' },
-  { id: 'cat_energy', label: 'Energy', minLabel: 'I have plenty of energy', maxLabel: 'I have no energy at all' },
+  {
+    id: 'cat_cough',
+    label: 'Do you cough during the day?',
+    minLabel: '0 — No',
+    maxLabel: '5 — Very much',
+  },
+  {
+    id: 'cat_phlegm',
+    label: 'Do you have mucus or phlegm in your chest?',
+    minLabel: '0 — No',
+    maxLabel: '5 — Very much',
+  },
+  {
+    id: 'cat_chest_tightness',
+    label: 'Do you feel chest tightness?',
+    minLabel: '0 — No',
+    maxLabel: '5 — Very much',
+  },
+  {
+    id: 'cat_breathlessness',
+    label: 'Do you get breathless when walking up a hill or stairs?',
+    minLabel: '0 — No',
+    maxLabel: '5 — Very much',
+  },
+  {
+    id: 'cat_activities',
+    label: 'Does your breathing limit your daily activities at home?',
+    minLabel: '0 — Not at all',
+    maxLabel: '5 — A lot',
+  },
+  {
+    id: 'cat_confidence',
+    label: 'Do you feel confident leaving your home despite breathing?',
+    minLabel: '0 — Very confident',
+    maxLabel: '5 — Not confident',
+  },
+  {
+    id: 'cat_sleep',
+    label: 'Does your breathing affect your sleep?',
+    minLabel: '0 — No',
+    maxLabel: '5 — Very much',
+  },
+  {
+    id: 'cat_energy',
+    label: 'How much energy do you have today?',
+    minLabel: '0 — Lots of energy',
+    maxLabel: '5 — No energy',
+  },
 ];
 
 export function DemoPage() {
   const navigate = useNavigate();
-  const { patientData, setSymptoms, setOtherSymptom, setCatScore, setVoiceData, setResults, reset } = useDemoStore();
+  const { patientData, setSymptoms, setOtherSymptom, setCatScore, setSmokingStatus, setVoiceData, setResults, reset } = useDemoStore();
   
-  const [step, setStep] = useState(0); // 0: Symptoms, 1: CAT, 2: Voice, 3: Processing
+  const [step, setStep] = useState(0); // 0: Symptoms, 1: Smoking, 2: CAT (sequential), 3: Voice, 4: Processing
+  const [showIntro, setShowIntro] = useState(true);
+  const [catIndex, setCatIndex] = useState(0);
 
   // Symptoms state
   const handleSymptomToggle = (symptom: string) => {
@@ -41,8 +83,7 @@ export function DemoPage() {
     }
   };
 
-  // CAT logic
-  const allCatAnswered = CAT_QUESTIONS.every(q => patientData.catScores[q.id] !== null);
+  // CAT logic handled by sequential `catIndex` (one question at a time)
 
   // Voice recording
   const [isRecording, setIsRecording] = useState(false);
@@ -171,7 +212,7 @@ export function DemoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setStep(3); // Go to processing step
+    setStep(4); // Go to processing step
     
     try {
       // 1. Send Clinical Data
@@ -219,7 +260,7 @@ export function DemoPage() {
     <div className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8 relative">
       <AppHeader />
       <div className="max-w-3xl mx-auto relative">
-        {step < 3 && (
+        {step < 4 && (
           <Link 
             to="/" 
             className="absolute -top-8 left-0 inline-flex items-center text-sm font-medium text-slate-700 hover:text-slate-800 transition-colors"
@@ -229,33 +270,28 @@ export function DemoPage() {
         )}
 
         {/* Header and Step Progress */}
-        <header className="mb-10 text-center">
+          <header className="mb-10 text-center">
           <h1 className="text-3xl font-black tracking-tight text-slate-900 mb-2">Patient Intake</h1>
-          <p className="text-slate-700">DASH Clinical Platform</p>
+          <p className="text-slate-700">PUHELU</p>
         </header>
 
-        {step < 3 && (
-          <div className="mb-8 flex justify-between items-center px-4 max-w-lg mx-auto relative">
-            <div className="absolute top-4 left-6 right-6 h-0.5 bg-slate-200 -z-10" />
-            {[0, 1, 2].map(idx => (
-              <div key={idx} className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-md flex items-center justify-center font-bold text-sm ${
-                  step >= idx ? 'bg-blue-600 text-white' : 'bg-white border-2 border-slate-200 text-slate-600'
-                }`}>
-                  {idx < step ? <Check className="w-4 h-4" /> : idx + 1}
-                </div>
-                <span className={`text-xs mt-2 font-medium ${step >= idx ? 'text-blue-800' : 'text-slate-600'}`}>
-                  {idx === 0 ? 'Symptoms' : idx === 1 ? 'CAT Score' : 'Voice'}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Removed numbered patient-facing progress per design. Intro guides user, then sequential questions. */}
 
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 min-h-[500px] flex flex-col">
           
+          {/* INTRO */}
+          {showIntro && (
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <h2 className="text-2xl font-bold text-slate-800 mb-4">Demo Health Survey</h2>
+              <p className="text-slate-700 max-w-xl mb-8">This is a demo health survey that will be used to map general health status and screen for COPD. You'll be asked one question at a time.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setShowIntro(false)} className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-md">Start Survey</button>
+              </div>
+            </div>
+          )}
+
           {/* STEP 0: SYMPTOMS */}
-          {step === 0 && (
+          {step === 0 && !showIntro && (
             <div className="flex-1 animate-fade-in flex flex-col">
               <h2 className="text-2xl font-bold text-slate-800 mb-2">Current Symptoms</h2>
               <p className="text-slate-700 mb-8">Select all the symptoms you are experiencing right now.</p>
@@ -287,52 +323,35 @@ export function DemoPage() {
                 </div>
               </div>
 
-              <div className="mt-auto flex justify-end border-t border-slate-100 pt-6">
+                <div className="mt-auto flex justify-end border-t border-slate-100 pt-6">
                 <button
                   onClick={() => setStep(1)}
                   className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
                 >
-                  Continue to Questionnaire <ArrowRight size={20} />
+                  Continue <ArrowRight size={20} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 1: CAT QUESTIONS */}
+          {/* STEP 1: Smoking question */}
           {step === 1 && (
-            <div className="flex-1 animate-fade-in flex flex-col h-full">
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">COPD Assessment Test (CAT)</h2>
-              <p className="text-slate-700 mb-6">Tap the score (0-5) that best describes your current status.</p>
-              
-              <div className="space-y-6 flex-1 overflow-y-auto pr-2" style={{ maxHeight: '60vh' }}>
-                {CAT_QUESTIONS.map((q) => (
-                  <div key={q.id} className="bg-slate-50 rounded-md p-5 border border-slate-200">
-                    <h3 className="text-center font-bold text-slate-800 mb-4">{q.label}</h3>
-                    <div className="flex justify-between items-end mb-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">
-                      <div className="w-1/3 text-left leading-tight">{q.minLabel}</div>
-                      <div className="w-1/3 text-right leading-tight">{q.maxLabel}</div>
-                    </div>
-                    
-                    <div className="flex justify-between gap-1 sm:gap-2">
-                      {[0, 1, 2, 3, 4, 5].map((score) => {
-                        const isSelected = patientData.catScores[q.id] === score;
-                        return (
-                          <button
-                            key={score}
-                            onClick={() => setCatScore(q.id, score)}
-                            className={`flex-1 py-3 sm:py-4 text-lg font-bold rounded-lg transition-all ${
-                              isSelected
-                                ? 'bg-blue-600 text-white shadow-md transform scale-105 border-blue-600'
-                                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'
-                            }`}
-                          >
-                            {score}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+            <div className="flex-1 animate-fade-in flex flex-col">
+              <h2 className="text-2xl font-bold text-slate-800 mb-2">Smoking Status</h2>
+              <p className="text-slate-700 mb-6">Please select the option that best describes your smoking history.</p>
+
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <div className="w-full max-w-md space-y-3">
+                  {['Never', 'Former', 'Current'].map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => setSmokingStatus(opt)}
+                      className={`w-full py-4 rounded-lg font-semibold border ${patientData.smokingStatus === opt ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="mt-6 flex justify-between pt-6 border-t border-slate-100">
@@ -344,10 +363,78 @@ export function DemoPage() {
                 </button>
                 <button
                   onClick={() => {
-                    if (!allCatAnswered) {
-                      alert("Please tap a score for all the questions to continue.");
+                    setCatIndex(0);
+                    setStep(2);
+                  }}
+                  className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  Continue <ArrowRight size={20} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: CAT questions — one at a time */}
+          {step === 2 && (
+            <div className="flex-1 animate-fade-in flex flex-col h-full">
+              {/* Present questions directly without naming the questionnaire */}
+
+              <div className="flex-1 flex flex-col items-center justify-center">
+                {(() => {
+                  const q = CAT_QUESTIONS[catIndex];
+                  const selected = patientData.catScores[q.id];
+                  return (
+                    <div key={q.id} className="w-full max-w-2xl bg-slate-50 rounded-md p-6 border border-slate-200">
+                      <h3 className="text-center font-bold text-slate-800 mb-4">{q.label}</h3>
+                      <div className="flex justify-between items-end mb-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                        <div className="w-1/3 text-left leading-tight">{q.minLabel}</div>
+                        <div className="w-1/3 text-right leading-tight">{q.maxLabel}</div>
+                      </div>
+                      <div className="flex justify-between gap-1 sm:gap-2">
+                        {[0, 1, 2, 3, 4, 5].map((score) => (
+                          <button
+                            key={score}
+                            onClick={() => {
+                              setCatScore(q.id, score);
+                              // auto-advance to next question, or to voice step if last
+                              if (catIndex < CAT_QUESTIONS.length - 1) {
+                                setCatIndex(prev => prev + 1);
+                              } else {
+                                setStep(3);
+                              }
+                            }}
+                            className={`flex-1 py-3 sm:py-4 text-lg font-bold rounded-lg transition-all ${selected === score ? 'bg-blue-600 text-white shadow-md transform scale-105 border-blue-600' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}
+                          >
+                            {score}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div className="mt-6 flex justify-between pt-6 border-t border-slate-100">
+                <button
+                  onClick={() => {
+                    if (catIndex === 0) setStep(1);
+                    else setCatIndex(prev => Math.max(0, prev - 1));
+                  }}
+                  className="text-slate-700 font-medium py-3 px-6 rounded-md hover:bg-slate-100 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => {
+                    const q = CAT_QUESTIONS[catIndex];
+                    if (patientData.catScores[q.id] === null) {
+                      alert('Please select a score to continue.');
+                      return;
+                    }
+                    if (catIndex < CAT_QUESTIONS.length - 1) {
+                      setCatIndex(prev => prev + 1);
                     } else {
-                      setStep(2);
+                      setStep(3);
                     }
                   }}
                   className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
@@ -358,20 +445,17 @@ export function DemoPage() {
             </div>
           )}
 
-          {/* STEP 2: VOICE RECORDING */}
-          {step === 2 && (
+          {/* STEP 3: VOICE RECORDING */}
+          {step === 3 && (
             <div className="flex-1 animate-fade-in flex flex-col">
               <h2 className="text-2xl font-bold text-slate-800 mb-2">Vocal Biomarker</h2>
               <div className="bg-blue-50 border border-blue-100 p-5 rounded-md mb-8">
                 <p className="text-blue-900 font-medium mb-2">
-                  <strong>Optional Instructions:</strong> We can analyze the sound of your voice. 
+                  <strong>Voice recording guidance:</strong>
                 </p>
-                <ol className="list-decimal list-inside text-blue-800 space-y-1">
-                  <li>Find a quiet place.</li>
-                  <li>Click "Start Recording".</li>
-                  <li>Take a deep breath and hold the <strong>"ahhhh"</strong> sound steadily for 6 seconds.</li>
-                  <li>The recording will stop automatically when the time is up.</li>
-                </ol>
+                <p className="text-blue-800">
+                  Please produce a long, steady vowel sound (for example, "ahhh") while keeping your mouth about a palm's length away from the microphone.
+                </p>
               </div>
               
               <div className="flex-1 flex flex-col items-center justify-center">
@@ -464,7 +548,7 @@ export function DemoPage() {
 
               <div className="mt-2 flex justify-between pt-6 border-t border-slate-100">
                 <button
-                  onClick={() => setStep(1)}
+                  onClick={() => setStep(2)}
                   className="text-slate-700 font-medium py-3 px-6 rounded-md hover:bg-slate-100 transition-colors"
                 >
                   Back
@@ -494,8 +578,8 @@ export function DemoPage() {
             </div>
           )}
 
-          {/* STEP 3: PROCESSING & TRANSITION */}
-          {step === 3 && (
+          {/* STEP 4: PROCESSING & TRANSITION */}
+          {step === 4 && (
             <div className="flex-1 animate-fade-in flex flex-col items-center justify-center text-center">
               {isSubmitting ? (
                 <>

@@ -5,6 +5,7 @@
         "Fatigue or weakness"
     ],
     "otherSymptom": "Occasional wheezing in the morning.",
+    "smoker_recent": true,
     "catScores": {
         "cat_cough": 4,
         "cat_phlegm": 3,

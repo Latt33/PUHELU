@@ -4,6 +4,7 @@ export interface PatientData {
   symptoms: string[];
   otherSymptom: string;
   catScores: Record<string, number | null>;
+  smokingStatus: string | null;
   voiceFile: File | null;
   voiceUrl: string | null;
   clinicalResult: any | null;
@@ -15,6 +16,7 @@ interface DemoStore {
   setSymptoms: (symptoms: string[]) => void;
   setOtherSymptom: (symptom: string) => void;
   setCatScore: (questionId: string, score: number) => void;
+  setSmokingStatus: (status: string | null) => void;
   setVoiceData: (file: File, url: string) => void;
   setResults: (clinicalResult: any, voiceResult: any) => void;
   reset: () => void;
@@ -33,6 +35,7 @@ const initialData: PatientData = {
     cat_sleep: null,
     cat_energy: null,
   },
+  smokingStatus: null,
   voiceFile: null,
   voiceUrl: null,
   clinicalResult: null,
@@ -49,6 +52,7 @@ export const useDemoStore = create<DemoStore>((set) => ({
       catScores: { ...state.patientData.catScores, [questionId]: score }
     }
   })),
+  setSmokingStatus: (smokingStatus) => set((state) => ({ patientData: { ...state.patientData, smokingStatus } })),
   setVoiceData: (file, url) => set((state) => ({
     patientData: { ...state.patientData, voiceFile: file, voiceUrl: url }
   })),

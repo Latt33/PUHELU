@@ -100,6 +100,23 @@ export function ClinicianPage() {
 
   const catIndicator = getCatScoreIndicator(totalCatScore);
 
+  const aiRisk = voiceResult?.risk_score ?? null;
+  const aiContainerClass = aiRisk === null
+    ? 'bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center'
+    : aiRisk >= 90
+      ? 'bg-red-50 p-5 rounded-xl border-2 border-red-200 shadow-sm flex flex-col justify-center'
+      : aiRisk > 80
+        ? 'bg-amber-50 p-5 rounded-xl border-2 border-amber-200 shadow-sm flex flex-col justify-center'
+        : 'bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center';
+
+  const aiNumberClass = aiRisk === null
+    ? 'text-slate-900 text-4xl font-black'
+    : aiRisk >= 90
+      ? 'text-red-700 text-4xl font-black'
+      : aiRisk > 80
+        ? 'text-amber-700 text-4xl font-black'
+        : 'text-slate-900 text-4xl font-black';
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-8 pb-32 relative">
       <AppHeader />
@@ -123,11 +140,10 @@ export function ClinicianPage() {
         {/* SECTION 1: Questionnaire Assessment */}
         <section>
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-              <ClipboardList className="w-8 h-8 text-slate-400" />
+            <h2 className="text-2xl font-black text-slate-900">
               1. Patient Reported Assessment
             </h2>
-            <p className="text-base text-slate-600 font-medium ml-10">Based on the pre-appointment digital intake questionnaire.</p>
+            <p className="text-base text-slate-600 font-medium ml-0">Based on the pre-appointment digital intake questionnaire.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ml-10">
@@ -182,11 +198,10 @@ export function ClinicianPage() {
         {/* SECTION 2: Vocal Biomarker Analysis */}
         <section>
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-              <Mic className="w-8 h-8 text-blue-600" />
+            <h2 className="text-2xl font-black text-slate-900">
               2. Vocal Biomarker Analysis
             </h2>
-            <p className="text-base text-slate-600 font-medium ml-10">AI-driven acoustic feature extraction from the patient's voice sample.</p>
+            <p className="text-base text-slate-600 font-medium ml-0">AI-driven acoustic feature extraction from the patient's voice sample.</p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 ml-10 relative overflow-hidden">
@@ -210,11 +225,10 @@ export function ClinicianPage() {
                       <div className="text-4xl font-black text-blue-700">{certaintyScore}%</div>
                       <div className="text-sm text-slate-500 mt-1 font-semibold">AI Confidence</div>
                     </div>
-                    
-                    <div className="bg-red-50 p-5 rounded-xl border-2 border-red-200 shadow-sm flex flex-col justify-center">
+                    <div className={aiContainerClass}>
                       <div className="text-slate-900 text-xs font-black mb-1 uppercase tracking-wider">Acoustic Risk</div>
-                      <div className="text-4xl font-black text-red-700">{voiceResult?.risk_score || 0}/100</div>
-                      <div className="text-sm text-red-600 mt-1 font-bold">Anomaly detected</div>
+                      <div className={aiNumberClass}>{voiceResult?.risk_score || 0}/100</div>
+                      <div className={`text-sm mt-1 font-bold ${aiRisk === null ? 'text-slate-600' : (aiRisk >= 90 ? 'text-red-600' : aiRisk > 80 ? 'text-amber-600' : 'text-slate-600')}`}>Anomaly detected</div>
                     </div>
                   </div>
 
@@ -279,11 +293,10 @@ export function ClinicianPage() {
         {/* SECTION 3: Comprehensive Overview */}
         <section className="pt-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-              <AlertCircle className="w-8 h-8 text-amber-500" />
+            <h2 className="text-2xl font-black text-slate-900">
               3. Final Evaluation & Recommendations
             </h2>
-            <p className="text-base text-slate-600 font-medium ml-10">Holistic overview combining patient reports and acoustic biomarkers.</p>
+            <p className="text-base text-slate-600 font-medium ml-0">Holistic overview combining patient reports and acoustic biomarkers.</p>
           </div>
 
           <div className="ml-10">

@@ -10,7 +10,7 @@ export function LandingPage() {
             <Activity className="h-12 w-12 text-blue-600" />
           </div>
           <h1 className="text-5xl font-black tracking-tight text-slate-900">
-            DASH Clinical Platform
+            PUHELU
           </h1>
           <p className="text-xl text-slate-800 max-w-2xl mx-auto leading-relaxed">
             A comprehensive respiratory assessment tool combining standard GOLD clinical guidelines with cutting-edge AI-driven vocal biomarker analysis.
@@ -46,7 +46,7 @@ export function LandingPage() {
         </div>
         
         <footer className="pt-16 text-sm text-slate-700">
-          <p>© {new Date().getFullYear()} DASH Health. Prototype built for demonstration purposes.</p>
+          <p>© {new Date().getFullYear()} PUHELU. Prototype built for demonstration purposes.</p>
         </footer>
       </div>
     </div>

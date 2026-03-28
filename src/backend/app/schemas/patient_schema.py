@@ -12,6 +12,7 @@ class PatientIntake(BaseModel):
     cat_energy: int = Field(..., ge=0, le=5, description="CAT: Lots of energy (0) to no energy at all (5)")
     exacerbations_past_year: int = Field(..., ge=0, description="Number of exacerbations in the past year")
     hospitalized_past_year: bool = Field(..., description="Was the patient hospitalized for COPD in the past year?")
+    smoker_recent: bool = Field(..., description="Smoked at least one cigarette in the past two weeks")
 
 class RiskAnalysisResponse(BaseModel):
     risk_group: str
