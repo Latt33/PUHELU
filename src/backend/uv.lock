@@ -1,4 +1,4 @@
-version = 1
+docker-compose up --buildversion = 1
 revision = 3
 requires-python = ">=3.9"
 resolution-markers = [
