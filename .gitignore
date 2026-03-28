@@ -36,8 +36,8 @@ out/
 # Data and SQLite
 *.db
 *.sqlite3
-data/
 src/backend/data/
+src/frontend/src/data/
 
 # Logs
 logs/

@@ -96,14 +96,14 @@ export const PatientForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-sm border border-slate-200">
+    <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-sm border border-slate-200">
       <h2 className="text-2xl font-semibold text-slate-800 mb-6 border-b border-slate-100 pb-4">CAT & Clinical Assessment</h2>
       
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Age</label>
+            <label className="block text-sm font-medium text-slate-800 mb-2">Age</label>
             <input
               type="number"
               name="age"
@@ -117,7 +117,7 @@ export const PatientForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Exacerbations (Past Year)</label>
+            <label className="block text-sm font-medium text-slate-800 mb-2">Exacerbations (Past Year)</label>
             <input
               type="number"
               name="exacerbations_past_year"
@@ -139,7 +139,7 @@ export const PatientForm: React.FC = () => {
                 checked={formData.hospitalized_past_year}
                 onChange={handleChange}
               />
-              <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">Hospitalized for COPD?</span>
+              <span className="text-sm font-medium text-slate-800 group-hover:text-slate-900 transition-colors">Hospitalized for COPD?</span>
             </label>
           </div>
         </div>
@@ -148,16 +148,16 @@ export const PatientForm: React.FC = () => {
         <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-slate-800">COPD Assessment Test (CAT)</h3>
-            <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+            <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-md">
               Score: {catScore}/40
             </span>
           </div>
-          <p className="text-sm text-slate-500 mb-6">For each item below, select the score (0-5) that best describes the patient currently.</p>
+          <p className="text-sm text-slate-700 mb-6">For each item below, select the score (0-5) that best describes the patient currently.</p>
           
           <div className="space-y-6">
             {CAT_QUESTIONS.map((q) => (
               <div key={q.id} className="border-b border-slate-200 pb-4 last:border-0 last:pb-0">
-                <div className="flex justify-between text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                <div className="flex justify-between text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
                   <span className="w-1/3 text-left">{q.minLabel} (0)</span>
                   <span className="w-1/3 text-center text-slate-800 font-bold">{q.label}</span>
                   <span className="w-1/3 text-right">{q.maxLabel} (5)</span>

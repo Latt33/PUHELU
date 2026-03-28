@@ -36,8 +36,12 @@ async def analyze_voice(file: UploadFile = File(...)):
         results = analyze_voice_audio(file_path)
         return results
     except ValueError as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail="Failed to process voice audio.")
     finally:
         # Delete after processing has been completed as requested

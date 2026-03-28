@@ -1,0 +1,30 @@
+{
+    "symptoms": [
+        "Cough",
+        "Shortness of breath (Dyspnea)",
+        "Fatigue or weakness"
+    ],
+    "otherSymptom": "Occasional wheezing in the morning.",
+    "catScores": {
+        "cat_cough": 4,
+        "cat_phlegm": 3,
+        "cat_chest_tightness": 4,
+        "cat_breathlessness": 5,
+        "cat_activities": 3,
+        "cat_confidence": 2,
+        "cat_sleep": 4,
+        "cat_energy": 3
+    },
+    "clinicalResult": {
+        "risk_group": "D",
+        "risk_level": "High Risk",
+        "recommended_action": "Urgent spirometry and specialist consultation recommended."
+    },
+    "voiceResult": {
+        "risk_score": 82,
+        "mpt": 8.7,
+        "jitter_status": "Elevated",
+        "shimmer_status": "Elevated",
+        "spectrogram_base64": ""
+    }
+}

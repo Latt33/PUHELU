@@ -16,7 +16,6 @@ export const VoiceUploader: React.FC = () => {
   const [result, setResult] = useState<VoiceAnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Recording states
   const [isRecording, setIsRecording] = useState(false);
