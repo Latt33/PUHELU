@@ -54,9 +54,7 @@ export const PatientForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const catScore = Object.keys(formData)
-    .filter(k => k.startsWith('cat_'))
-    .reduce((sum, k) => sum + (Number(formData[k as keyof PatientFormData]) || 0), 0);
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

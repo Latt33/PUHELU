@@ -14,16 +14,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy uv from the official Astral image for fast installs
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+# Set working directory
 WORKDIR /app
 
-# Copy dependency files to leverage Docker cache
-COPY pyproject.toml uv.lock ./
+# Copy dependency files to leverage Docker cache (use explicit src/backend paths so
+# builds that use the repository root as the build context still succeed)
+COPY src/backend/pyproject.toml src/backend/uv.lock ./
 
 # Install Python dependencies (creates managed venv inside /app)
 RUN uv sync --frozen
 
-# Copy application source
-COPY . .
+# Copy application source from src/backend when the build context is repository root
+# (keeps the same layout as building with src/backend as the context)
+COPY src/backend/. .
 
 # Create non-root user and app data directory, set ownership
 RUN addgroup --system app && adduser --system --ingroup app app \
