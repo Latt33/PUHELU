@@ -37,7 +37,6 @@ out/
 *.db
 *.sqlite3
 src/backend/data/
-src/frontend/src/data/
 
 # Claude Code
 CLAUDE.md
