@@ -1,19 +1,30 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, Menu, X } from 'lucide-react';
 
 export const AppHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-      <Link 
-        to="/" 
-        className="flex items-center justify-center w-12 h-12 bg-white rounded-md shadow-md text-slate-800 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-        aria-label="Home"
-      >
-        <Home className="h-6 w-6" />
-      </Link>
+      {location.pathname === '/' ? (
+        <Link 
+          to="/" 
+          className="flex items-center justify-center w-12 h-12 bg-white rounded-md shadow-md text-slate-800 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+          aria-label="Home"
+        >
+          <Home className="h-6 w-6" />
+        </Link>
+      ) : (
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
+          aria-label="Back to Main"
+        >
+          Back to Main
+        </Link>
+      )}
       <div className="relative">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}

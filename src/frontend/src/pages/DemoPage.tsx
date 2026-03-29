@@ -74,6 +74,9 @@ export function DemoPage() {
   const [showIntro, setShowIntro] = useState(true);
   const [catIndex, setCatIndex] = useState(0);
 
+  const currentCatQuestion = CAT_QUESTIONS[catIndex];
+  const currentCatAnswered = patientData.catScores[currentCatQuestion.id] !== null;
+
   // Symptoms state
   const handleSymptomToggle = (symptom: string) => {
     if (patientData.symptoms.includes(symptom)) {
@@ -228,6 +231,8 @@ export function DemoPage() {
         cat_energy: patientData.catScores.cat_energy || 0,
         exacerbations_past_year: 0,
         hospitalized_past_year: false,
+        // Map smoking status string to boolean expected by backend
+        smoker_recent: (patientData.smokingStatus === 'Current')
       });
 
       // 2. Send Voice Data (if provided)
@@ -354,7 +359,7 @@ export function DemoPage() {
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-between pt-6 border-t border-slate-100">
+                <div className="mt-6 flex justify-between pt-6 border-t border-slate-100">
                 <button
                   onClick={() => setStep(0)}
                   className="text-slate-700 font-medium py-3 px-6 rounded-md hover:bg-slate-100 transition-colors"
@@ -395,13 +400,8 @@ export function DemoPage() {
                           <button
                             key={score}
                             onClick={() => {
+                              // only set the selected score; do NOT advance automatically
                               setCatScore(q.id, score);
-                              // auto-advance to next question, or to voice step if last
-                              if (catIndex < CAT_QUESTIONS.length - 1) {
-                                setCatIndex(prev => prev + 1);
-                              } else {
-                                setStep(3);
-                              }
                             }}
                             className={`flex-1 py-3 sm:py-4 text-lg font-bold rounded-lg transition-all ${selected === score ? 'bg-blue-600 text-white shadow-md transform scale-105 border-blue-600' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}
                           >
@@ -437,7 +437,8 @@ export function DemoPage() {
                       setStep(3);
                     }
                   }}
-                  className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  disabled={!currentCatAnswered}
+                  className={`${currentCatAnswered ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-300 text-slate-600 cursor-not-allowed'} font-semibold py-3 px-8 rounded-md transition-colors flex items-center gap-2`}
                 >
                   Continue <ArrowRight size={20} />
                 </button>
