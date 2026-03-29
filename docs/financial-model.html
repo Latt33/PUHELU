@@ -992,6 +992,37 @@ window.addEventListener('resize',function(){var r=calc(currentValues);renderChar
       <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> The model assumed full physician engagement from Day 1. At base case 50% engagement, this generated ~7,000 spirometry referrals (&euro;764k) in Year 1 &mdash; equivalent to ~23 additional tests per health centre per month. While technically absorbable, it ignored that physician adoption takes time: early adopters first, then gradual uptake.</p>
       <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Year 0 engagement is 65% of the slider value (doctors are still learning the system). Expansion years (when new EHR regions come online) use 75% of the slider value. Full engagement rate from Year 1 in established regions. This reduces Year 0 spirometry costs by ~35% and makes the early P&amp;L more realistic.</p>
     </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">25. Inflation adjustment on all unit costs (&times;1.4)</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> All cost data came from 2006&ndash;2015 studies (Herse 2015, Viinanen 2019). Finnish healthcare costs have risen ~2.5%/yr since then. Using old figures understated both costs and savings, but savings more (hospitalisations have inflated faster than outpatient visits).</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Applied &times;1.4 inflation adjustment to all unit costs: acute care &euro;509&rarr;&euro;713, spirometry &euro;110&rarr;&euro;154, COPD-specific delta &euro;218&rarr;&euro;305, GP cost &euro;15&rarr;&euro;21. Cross-check: ARCTIC study (Lisspers et al. 2018, Swedish data) found &euro;1,278/yr savings from early diagnosis &mdash; our &euro;713 is still 44% below that, confirming the adjustment is conservative.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">26. Smoking cessation savings added</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Rationale:</strong> COPD diagnosis is one of the strongest triggers for smoking cessation. The Lung Health Study (Anthonisen et al. 2002) showed sustained quitters had 10% progression to severe vs 38% for continuing smokers. Diagnosis increases quit probability by OR 1.4&ndash;1.8 (Hvidsten et al., Resp Med 2010, Hordaland cohort).</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Implementation:</strong> 15% of diagnosed patients quit smoking (conservative). Each quitter saves &euro;1,000/yr in COPD-related costs (reduced exacerbations, slower FEV1 decline). Ramps from Year 1 (cessation health benefits take months to materialise). This does NOT include non-COPD health benefits of quitting (cardiovascular, cancer) &mdash; those are additional unmodelled value.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">27. Societal savings added</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Rationale:</strong> COPD causes significant indirect economic costs: productivity loss (absenteeism, presenteeism, early retirement), disability benefit payments (Kela), and informal caregiving burden. Finnish and international literature consistently estimates indirect COPD costs at 1.5&ndash;2&times; direct healthcare costs.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Implementation:</strong> Indirect savings modelled as 1.5&times; direct savings (the &ldquo;additional 0.5&times;&rdquo; societal portion). These savings accrue to employers, Kela (disability insurance), and families &mdash; not directly to the wellbeing county&rsquo;s healthcare budget. Shown separately so the county can see their direct ROI without societal value, and policymakers can see the full picture.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">28. Screening accuracy raised: sensitivity 80%, specificity 88%</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Previous:</strong> Sensitivity 70%, specificity 80% base case.</p>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Rationale:</strong> PUHELU operates on a pre-selected smoking-exposed population with a custom branching questionnaire + vocal biomarker. This is not generic population screening &mdash; the pre-selection removes 70% of the population that would generate most false positives, and the multi-signal approach (questionnaire + voice) outperforms single-instrument tools. 80% sensitivity / 88% specificity is achievable for this design.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Effect:</strong> More diagnoses per year, fewer false positive flags (~6,000 vs ~10,000), lower spirometry cost burden.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">29. Clinical filter on false positive spirometry referrals</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> The model applied the same physician engagement rate to both true positive and false positive flags. In reality, a doctor reviewing a flag for a healthy-looking patient with a borderline score is much more likely to dismiss it than to order spirometry. Clinical judgment acts as a second filter on top of the screening tool&rsquo;s specificity.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> FP engagement set to 50% of TP engagement. True positive flags tend to have higher scores and corroborating symptoms; false positives cluster near the scoring threshold where doctors are more likely to dismiss. Effect: FP spirometries in Year 1 drop from ~1,950 to ~975 &mdash; about 4 unnecessary tests per health centre per month across the HUS region.</p>
+    </div>
   </div>
 </div>
 
