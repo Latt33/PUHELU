@@ -4,6 +4,9 @@ import numpy as np
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
+import subprocess
+import os
+import uuid
 
 # Matplotlib configuration for backend usage
 import matplotlib
@@ -13,10 +16,21 @@ def analyze_voice_audio(file_path: str):
     """
     Simulates AI voice biomarker extraction on a given audio file.
     """
+    converted_path = None
     try:
-        # Load audio using librosa directly from the file path.
-        # This is safer for librosa as it handles various codecs better via paths.
-        y, sr = librosa.load(file_path, sr=None)
+        # Convert the file to WAV reliably using FFmpeg before librosa reads it
+        converted_path = file_path + "_" + uuid.uuid4().hex + ".wav"
+        
+        # Suppress ffmpeg output but throw error if it fails
+        subprocess.run(
+            ['ffmpeg', '-y', '-i', file_path, '-ar', '22050', '-ac', '1', converted_path],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        
+        # Load audio using librosa directly from the converted WAV file
+        y, sr = librosa.load(converted_path, sr=None)
         
         # Calculate max phonation time (MPT)
         mpt = len(y) / sr if sr else 0
@@ -61,5 +75,14 @@ def analyze_voice_audio(file_path: str):
             "shimmer_status": shimmer_status
         }
         
+    except subprocess.CalledProcessError as e:
+        raise ValueError(f"FFmpeg conversion failed. Ensure the uploaded file is valid audio.")
     except Exception as e:
         raise ValueError(f"Error processing audio: {str(e)}")
+    finally:
+        # Clean up the temporary WAV file
+        if converted_path and os.path.exists(converted_path):
+            try:
+                os.remove(converted_path)
+            except:
+                pass

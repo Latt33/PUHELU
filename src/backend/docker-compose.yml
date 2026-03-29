@@ -4,9 +4,16 @@ services:
   backend:
     build: .
     container_name: dash_backend
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     volumes:
       # Optional: Mount local data folder for easier debugging of saved wav files
       - ./data:/app/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3

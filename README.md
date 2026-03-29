@@ -1,6 +1,6 @@
-# DASH: Clinical Assessment Platform
+# PUHELU: Clinical Assessment Platform
 
-DASH is a clinical assessment platform designed to evaluate patient COPD risk combining standard GOLD 2023 Guidelines (CAT questionnaire) with AI-driven vocal biomarker analysis. 
+PUHELU is a clinical assessment platform designed to evaluate patient COPD risk combining standard GOLD 2023 Guidelines (CAT questionnaire) with AI-driven vocal biomarker analysis. 
 
 The application is structured as a modern monorepo featuring a React frontend and a Dockerized FastAPI/Python backend.
 
@@ -42,6 +42,26 @@ npm run dev
 ```
 
 The frontend will run at `http://localhost:5173`. 
+
+### Developer notes: CORS and Vite plugin
+
+- If you run the frontend dev server at `http://localhost:5173` and the backend at `http://localhost:8000`, the browser will send a CORS preflight OPTIONS request. During development the backend is configured to read `CORS_ORIGINS` from the environment. To avoid preflight failures either set the env var for the backend or ensure the backend's config provides `http://localhost:5173` as an allowed origin.
+
+Example (docker-compose / local env):
+```powershell
+# from the repo root
+cd src/backend
+# add to .env or export before running
+setx CORS_ORIGINS "http://localhost:5173,http://127.0.0.1:5173"
+docker-compose up --build
+```
+
+- Vite plugin: this project uses the official `@vitejs/plugin-react` plugin to stay compatible with Vite 8. If you previously saw an `ERESOLVE` error during `npm install` referencing `@vitejs/plugin-react-oxc`, that plugin is incompatible with Vite 8 and has been replaced in `package.json` and `vite.config.ts`.
+
+If you prefer to quickly bypass npm peer dependency checks (not recommended long-term), run:
+```bash
+npm install --legacy-peer-deps
+```
 
 ## Features
 
