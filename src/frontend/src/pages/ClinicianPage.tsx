@@ -1,6 +1,6 @@
 ﻿import { useDemoStore } from '../store/demoStore';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mic, Stethoscope, ClipboardList, AlertCircle, Activity, BrainCircuit } from 'lucide-react';
+import { ArrowLeft, Mic, Stethoscope, Activity, BrainCircuit } from 'lucide-react';
 import { AppHeader } from '../components/AppHeader';
 import { useState } from 'react';
 import mockPatientData from '../assets/mockData.json';
