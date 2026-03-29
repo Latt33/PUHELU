@@ -353,9 +353,13 @@ function calc(v){
     undiagPool=Math.max(0,undiagPool-yearDx);
 
     // FALSE POSITIVES: fraction of untested non-COPD pool gets screened and flagged
+    // Doctor reviews flag before ordering spirometry. Healthy-looking patients with
+    // borderline scores get dismissed — clinical judgment acts as a second filter.
+    // FP engagement is lower than TP engagement (doctors are better at spotting noise).
     var fpScreened=Math.round(fpUntestedPool*annualProb);
     var yearFP=Math.round(fpScreened*(1-spec));
-    var yearSpiroFP=Math.round(yearFP*curEng);
+    var fpEngagement=curEng*0.5; // doctors dismiss ~half of FP flags on clinical judgment
+    var yearSpiroFP=Math.round(yearFP*fpEngagement);
     fpUntestedPool=Math.max(0,fpUntestedPool-yearSpiroFP);
 
     // PHYSICIAN ENGAGEMENT: slider value is the steady-state rate.
