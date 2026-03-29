@@ -41,4 +41,4 @@ USER app
 EXPOSE 8000
 
 # Run Uvicorn with multiple workers and proxy headers for production
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--proxy-headers", "--log-level", "info"]
+CMD ["sh", "-lc", "uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 4 --proxy-headers --log-level info"]

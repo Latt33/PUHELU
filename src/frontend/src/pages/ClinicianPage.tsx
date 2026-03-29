@@ -135,6 +135,9 @@ export function ClinicianPage() {
               <p className="text-base text-slate-600 font-medium mt-1">Patient ID: #8492-B • Pre-appointment screening</p>
             </div>
           </div>
+
+          <div className="flex items-center gap-3">
+          </div>
         </div>
 
         {/* SECTION 1: Questionnaire Assessment */}

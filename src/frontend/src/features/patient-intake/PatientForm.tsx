@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../api/client';
 import { RiskFlag } from './RiskFlag';
 
@@ -50,6 +50,7 @@ export const PatientForm: React.FC = () => {
     smoker_recent: false,
   });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | ''>('');
   const [result, setResult] = useState<RiskResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,6 +91,12 @@ export const PatientForm: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const q = CAT_QUESTIONS[currentQuestionIndex];
+    const existing = formData[q.id as keyof PatientFormData];
+    setSelectedAnswer(existing === '' ? '' : Number(existing));
+  }, [currentQuestionIndex, formData]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
@@ -101,6 +108,8 @@ export const PatientForm: React.FC = () => {
       [name]: newValue,
     }));
   };
+
+  const nextEnabled = selectedAnswer !== '';
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-sm border border-slate-200">
@@ -185,13 +194,18 @@ export const PatientForm: React.FC = () => {
 
                   <div className="flex justify-center gap-3">
                     {[0,1,2,3,4,5].map((i) => (
-                      <label key={i} className="flex flex-col items-center cursor-pointer">
+                      <label
+                        key={i}
+                        className="flex flex-col items-center cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); }}
+                      >
                         <input
                           type="radio"
                           name={q.id}
                           value={String(i)}
-                          checked={formData[q.id as keyof PatientFormData] === i}
-                          onChange={handleChange}
+                          checked={selectedAnswer === i}
+                          onChange={() => setSelectedAnswer(i)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
                           className="peer hidden"
                         />
                         <div className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-300 peer-checked:bg-blue-600 peer-checked:text-white">{i}</div>
@@ -199,7 +213,7 @@ export const PatientForm: React.FC = () => {
                     ))}
                   </div>
 
-                  <div className="flex justify-between mt-4">
+                    <div className="flex justify-between mt-4">
                     <button
                       type="button"
                       onClick={() => setCurrentQuestionIndex((p) => Math.max(0, p - 1))}
@@ -211,9 +225,16 @@ export const PatientForm: React.FC = () => {
 
                     <button
                       type="button"
-                      onClick={() => setCurrentQuestionIndex((p) => Math.min(CAT_QUESTIONS.length - 1, p + 1))}
-                      disabled={formData[q.id as keyof PatientFormData] === ''}
-                      className="px-3 py-2 rounded-md bg-blue-600 text-white disabled:opacity-50"
+                      onClick={() => {
+                        // commit selected answer to formData, then advance
+                        setFormData((prev) => ({
+                          ...prev,
+                          [q.id]: selectedAnswer === '' ? '' : Number(selectedAnswer),
+                        }));
+                        setCurrentQuestionIndex((p) => Math.min(CAT_QUESTIONS.length - 1, p + 1));
+                      }}
+                        disabled={!nextEnabled}
+                        className={`${nextEnabled ? 'px-3 py-2 rounded-md bg-blue-600 text-white' : 'px-3 py-2 rounded-md bg-slate-300 text-slate-700 cursor-not-allowed'}`}
                     >
                       Next
                     </button>
