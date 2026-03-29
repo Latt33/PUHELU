@@ -174,7 +174,7 @@
       </div>
       <div class="panel" id="funnel-panel">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <h2 style="margin-bottom:0;">Screening Funnel <span style="font-weight:400;font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;">&mdash; Year 1 &middot; Helsinki/Apotti only &middot; steady-state engagement</span></h2>
+          <h2 style="margin-bottom:0;">Screening Funnel <span style="font-weight:400;font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;">&mdash; Year 1 &middot; HUS-yhtym&auml; / Apotti &middot; steady-state engagement</span></h2>
           <button onclick="document.getElementById('funnel-panel').style.display='none';document.getElementById('funnel-toggle-bar').style.display='block';" style="font-family:var(--font-heading);font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;cursor:pointer;">Hide</button>
         </div>
         <div id="funnel"></div>
@@ -216,6 +216,7 @@ var TIPS = {
   falsePos:['False positives flagged','Non-COPD patients incorrectly flagged. These generate unnecessary spirometry referrals and can erode physician trust if too high.','(Screened \u2212 COPD cases) \u00D7 (1 \u2212 Specificity)'],
   spiroTP:['Spirometry referrals (TP)','True positive flags where the physician followed through with a spirometry order.','Correctly flagged \u00D7 Physician engagement'],
   spiroFP:['Spirometry referrals (FP)','False positive flags where the physician ordered spirometry for a non-COPD patient. Each costs \u20AC110.','False positives \u00D7 Physician engagement'],
+  ppv:['Positive predictive value','Of all flags the screening generates, what percentage are true COPD cases. Higher PPV = fewer wasted spirometries, more physician trust. Driven by prevalence in the screened pool (pre-selected smokers = high prevalence = better PPV than general population screening). A PPV above 40% is good for a screening tool.','True positive flags \u00F7 (TP + FP flags)'],
   newDx:['New COPD diagnoses','Confirmed new cases after spirometry.','TP spirometry referrals \u00D7 80% confirmation rate'],
   kpiDx:['5-Year New Diagnoses','Cumulative previously-undiagnosed COPD patients identified over 5 years. Annual yield declines as the undiagnosed pool gradually depletes and easiest-to-reach patients are screened first.','Sum of annual diagnoses with year-over-year decay'],
   kpiROI:['5-Year ROI','Returns divided by costs for the selected funding model perspective over 5 years. In pharma-led model, this is medication revenue \u00F7 pharma investment.','Returns \u00F7 Costs (perspective-dependent)'],
@@ -503,17 +504,18 @@ function renderKPIs(r){
 function renderFunnel(r){
   var el=document.getElementById('funnel');el.textContent='';var C=CONSTANTS;
   var pctAnn=Math.round(r.annualProb*100);
+  var ppv=r.truePos+r.falsePos>0?Math.round(r.truePos/(r.truePos+r.falsePos)*100):0;
+  var fpSpiroAfterFilter=Math.round(r.spiroFalse);
   [['Eligible patients (smoking-exposed)',fmt(C.uniquePatients),'eligible'],
    ['Per-SMS completion rate',Math.round(C.smsDelivery*currentValues.clickThrough/100*currentValues.completion/100*100)+'%','perSmsRate'],
    ['Visits per patient per year',C.visitsPerYear.toFixed(1),'visitsPerYear'],
    ['Annual screening probability',pctAnn+'%','annualProb'],
    ['Unique patients screened / year',fmt(r.screened),'screened'],
    ['COPD cases in pool',fmt(r.copdInPool),'copdInPool'],
-   ['Undiagnosed in pool (49%)',fmt(r.undiagnosed),'undiagnosed'],
-   ['Correctly flagged',fmt(r.truePos),'truePos'],
-   ['False positives flagged',fmt(r.falsePos),'falsePos'],
-   ['Spirometry referrals (TP)',fmt(r.spiroTrue),'spiroTP'],
-   ['Spirometry referrals (FP)',fmt(r.spiroFalse),'spiroFP'],
+   ['Undiagnosed in pool (60%)',fmt(r.undiagnosed),'undiagnosed'],
+   ['Spirometry referrals (true positive)',fmt(r.spiroTrue),'spiroTP'],
+   ['Spirometry referrals (false positive)',fmt(fpSpiroAfterFilter),'spiroFP'],
+   ['Flag positive predictive value',ppv+'%','ppv'],
    ['New COPD diagnoses',fmt(r.newDx),'newDx']
   ].forEach(function(s){var row=document.createElement('div');row.className='funnel-step';
     var lab=document.createElement('span');lab.className='label';lab.textContent=s[0];tip(lab,s[2]);
@@ -649,8 +651,9 @@ function renderDualPanels(r){
   // COUNTY PANEL — full width
   countyEl.textContent='';
   var ch=document.createElement('div');ch.className='side-header';
-  var ch3=document.createElement('h3');ch3.textContent='HUS-yhtym\u00E4';
-  ch.appendChild(ch3);countyEl.appendChild(ch);
+  var ctag=document.createElement('span');ctag.className='tag tag-county';ctag.textContent='PUBLIC';
+  var ch3=document.createElement('h3');ch3.textContent='HUS-yhtym\u00E4 / Apotti';
+  ch.appendChild(ctag);ch.appendChild(ch3);countyEl.appendChild(ch);
 
   var ci=document.createElement('div');ci.className='side-invest';
   var camt=document.createElement('div');camt.className='amount';camt.style.color='var(--blue)';
