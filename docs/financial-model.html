@@ -115,6 +115,17 @@
   canvas.mini { width: 100%; height: 140px; display: block; }
   .alignment-bar { background: var(--section-alt); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 20px; margin-bottom: 24px; font-size: 13px; color: var(--dim); text-align: center; }
   .alignment-bar strong { color: var(--text); font-weight: 600; }
+  .roadmap-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+  .roadmap-year { text-align: center; padding: 10px 8px; border-right: 1px solid var(--border); }
+  .roadmap-year:last-child { border-right: none; }
+  .roadmap-year .ry-label { font-family: var(--font-heading); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .roadmap-year .ry-region { font-family: var(--font-heading); font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+  .roadmap-year .ry-pop { font-size: 12px; color: var(--dim); margin-bottom: 2px; }
+  .roadmap-year .ry-dx { font-family: var(--font-heading); font-size: 16px; font-weight: 700; color: var(--blue); }
+  .roadmap-year .ry-dx-label { font-family: var(--font-heading); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .roadmap-year.active { background: var(--blue-light); border-radius: 6px; }
+  .roadmap-bar { height: 4px; background: var(--border); border-radius: 2px; margin: 8px 0; position: relative; }
+  .roadmap-bar-fill { height: 100%; background: var(--blue); border-radius: 2px; transition: width 0.3s; }
   .view-hidden { display: none; }
   .detail-content { padding: 0; }
 </style>
@@ -152,6 +163,7 @@
         <div class="side-panel pharma" id="sp-pharma"></div>
         <div class="side-panel county" id="sp-county"></div>
       </div>
+      <div class="panel" id="expansion-roadmap" style="margin-top:16px;"></div>
       <div class="alignment-bar" id="alignment-bar"></div>
       <div class="kpi-row" id="kpis"></div>
     </div>
@@ -732,7 +744,49 @@ function drawMiniChart(canvasId,values,threshold,color,lineLabel,threshLabel){
   if(threshold!==0){ctx.fillStyle='#d97757';ctx.textAlign='left';ctx.fillText(threshLabel,pad.left+4,y0-5);}
 }
 
-function recalc(){var r=calc(currentValues);renderDualPanels(r);renderKPIs(r);renderFunnel(r);renderCashflow(r);renderChart(r);renderSensitivity(r);}
+function renderExpansion(r){
+  var el=document.getElementById('expansion-roadmap');el.textContent='';
+  var C=CONSTANTS;
+  var label=document.createElement('div');label.className='section-label';
+  label.textContent='Expansion Roadmap';el.appendChild(label);
+
+  var grid=document.createElement('div');grid.className='roadmap-grid';
+
+  var regions=[
+    {name:'Helsinki \u00B7 Vantaa \u00B7 Kerava',ehr:'Apotti',pop:'970k'},
+    {name:'+Lifecare (starts)',ehr:'+Lifecare',pop:'1.4M'},
+    {name:'+Lifecare full +others',ehr:'+OMNI360',pop:'2.1M'},
+    {name:'Most regions live',ehr:'+Esko',pop:'2.7M'},
+    {name:'Full national',ehr:'All 4 EHR',pop:'3.2M (5.6M total)'}
+  ];
+
+  for(var i=0;i<5;i++){
+    var y=r.years[i];
+    var col=document.createElement('div');col.className='roadmap-year';
+
+    var lbl=document.createElement('div');lbl.className='ry-label';lbl.textContent='Year '+(i+1);
+    var reg=document.createElement('div');reg.className='ry-region';reg.textContent=regions[i].name;
+    var pop=document.createElement('div');pop.className='ry-pop';pop.textContent='Pop. covered: '+regions[i].pop;
+    var elig=document.createElement('div');elig.className='ry-pop';elig.textContent='Eligible: '+fmt(Math.round(C.uniquePatients*C.expansionMultiplier[i]));
+
+    var bar=document.createElement('div');bar.className='roadmap-bar';
+    var fill=document.createElement('div');fill.className='roadmap-bar-fill';
+    fill.style.width=Math.round(C.expansionMultiplier[i]/3.3*100)+'%';
+    bar.appendChild(fill);
+
+    var dx=document.createElement('div');dx.className='ry-dx';dx.textContent=fmt(y.yearDx);
+    var dxl=document.createElement('div');dxl.className='ry-dx-label';dxl.textContent='new diagnoses';
+    var cuml=document.createElement('div');cuml.className='ry-pop';cuml.style.marginTop='4px';
+    cuml.textContent='Cumulative: '+fmt(y.cumDx);
+
+    col.appendChild(lbl);col.appendChild(reg);col.appendChild(pop);col.appendChild(elig);
+    col.appendChild(bar);col.appendChild(dx);col.appendChild(dxl);col.appendChild(cuml);
+    grid.appendChild(col);
+  }
+  el.appendChild(grid);
+}
+
+function recalc(){var r=calc(currentValues);renderDualPanels(r);renderExpansion(r);renderKPIs(r);renderFunnel(r);renderCashflow(r);renderChart(r);renderSensitivity(r);}
 buildSliders();recalc();
 window.addEventListener('resize',function(){var r=calc(currentValues);renderChart(r);renderDualPanels(r);});
 </script>
