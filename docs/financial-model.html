@@ -206,7 +206,7 @@ var TIPS = {
   annualProb:['Annual screening probability','Probability a patient completes screening at least once during the year, given multiple visits. Compounds across ~3 opportunities.','1 \u2212 (1 \u2212 per-SMS rate) ^ visits/yr'],
   screened:['Unique patients screened per year','Patients who complete screening at least once this year. Higher than single-SMS conversion because of ~3 opportunities per year.','Eligible \u00D7 Annual screening probability'],
   copdInPool:['COPD cases in pool','Estimated patients in the screened pool who actually have COPD, whether diagnosed or not. Applied as a flat prevalence rate.','Screened \u00D7 Prevalence rate'],
-  undiagnosed:['Undiagnosed in pool','49% of people with spirometry-confirmed airflow obstruction in Finland had no prior COPD diagnosis.','COPD in pool \u00D7 49% (Kotaniemi et al. 2005)'],
+  undiagnosed:['Undiagnosed in pool','70% of COPD cases are undiagnosed (Diab et al., AJRCCM 2018: 70\u201380% globally; OLIN Sweden: 50\u201370%; Hvidsten Norway: 70%). Previous model used 49% from Kotaniemi 2005 (Finnish, but outdated and most conservative available). Finnish treatment data corroborates: 330k prevalence vs 25\u201350k treated = 85\u201392% not on therapy.','COPD in pool \u00D7 70% (Diab et al. 2018)'],
   truePos:['Correctly flagged','Undiagnosed COPD patients the screening correctly identifies as at-risk.','Undiagnosed \u00D7 Sensitivity'],
   falsePos:['False positives flagged','Non-COPD patients incorrectly flagged. These generate unnecessary spirometry referrals and can erode physician trust if too high.','(Screened \u2212 COPD cases) \u00D7 (1 \u2212 Specificity)'],
   spiroTP:['Spirometry referrals (TP)','True positive flags where the physician followed through with a spirometry order.','Correctly flagged \u00D7 Physician engagement'],
@@ -247,7 +247,7 @@ var CONSTANTS={
   uniquePatients:115000,        // unique smoking-exposed patients visiting Helsinki primary care/yr. NOTE: this is ~80% of total smoking-exposed adults (~144,000). ~20% never visit due to avoidance, shame, distrust, mental health barriers. PUHELU cannot reach non-visitors.
   visitsPerYear:3.0,            // primary care visits per patient per year (THL: 2.5-3.5 general, smokers higher, Helsinki lower)
   smsDelivery:0.92,             // SMS delivery rate
-  undiagnosedFraction:0.49,     // Kotaniemi et al. 2005
+  undiagnosedFraction:0.70,     // Diab et al., AJRCCM 2018: 70-80% globally. OLIN (Sweden): 50-70%. Hvidsten (Norway): 70%. Old Finnish estimate (Kotaniemi 2005): 49% — outdated and most conservative available
   spirometryConfirmation:0.80,  // spirometry confirms COPD in true-positive referrals
   spirometryCost:154,           // EUR per spirometry: 110 × 1.4 inflation adj from 2010 to 2024 (Viinanen 2019 base)
   acuteCarePerPatient:713,      // EUR/yr: (450+59) × 1.4 inflation adj from 2010 to 2024. Cross-check: ARCTIC study (Lisspers 2018) found €1,278/yr — our figure is still conservative
@@ -1042,6 +1042,13 @@ window.addEventListener('resize',function(){var r=calc(currentValues);renderChar
       <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> ~20% of smoking-exposed adults (~29,000 in the Apotti region) never visit primary care. They avoid the healthcare system due to shame about smoking, fear of diagnosis, distrust, mental health barriers, or access issues. PUHELU&rsquo;s SMS-based screening cannot reach them.</p>
       <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Why it matters:</strong> This cohort is likely sicker than the general smoking-exposed population &mdash; no preventive care, no screening, no early intervention. When they eventually present, it&rsquo;s through the ER with acute exacerbations at late COPD stages (GOLD III/IV). This is the most expensive care pathway and the worst outcome trajectory. They may never be screened unless a different intervention model reaches them.</p>
       <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Model treatment:</strong> The eligible pool (115,000) represents ~80% of total smoking-exposed adults. The model does not claim to reach the remaining 20%. This is documented as a ceiling on PUHELU&rsquo;s addressable market. Reaching non-visitors would require complementary interventions: community outreach, pharmacy-based screening, workplace health programmes, or social services integration. The unscreened cohort represents both a limitation of this model and an argument for broader public health investment beyond PUHELU.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">31. Undiagnosed fraction: 49% &rarr; 70%</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Previous:</strong> 49% from Kotaniemi et al. 2005 &mdash; a 21-year-old Finnish population study. The most conservative estimate available.</p>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> Every other source reports higher rates. Diab et al. (AJRCCM 2018, systematic review): 70&ndash;80%. OLIN Studies (Sweden): 50&ndash;70%. Hvidsten et al. (Norway): 70%. Finnish treatment data: 330k prevalence vs 25&ndash;50k treated = 85&ndash;92% not on therapy. The 49% was from a study population that was actively investigated, which itself increases diagnosis rates.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Updated to 70% &mdash; the low end of Diab et al.&rsquo;s 70&ndash;80% range, consistent with Nordic data. This significantly increases the undiagnosed pool available for PUHELU to detect, and aligns with the reality that most GOLD Stage I/II patients are asymptomatic and never get spirometry unless prompted.</p>
     </div>
   </div>
 </div>
