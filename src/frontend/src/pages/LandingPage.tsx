@@ -37,7 +37,7 @@ export function LandingPage() {
             through primary care SMS.
           </h1>
           <p className="mb-10 text-lg md:text-xl text-muted-foreground max-w-[540px] mx-auto leading-relaxed">
-            Embeds validated screening into the appointment confirmation patients already receive. No hardware, no training, no workflow changes.
+            Embeds validated screening into the appointment confirmation patients already receive.<br />No new hardware, no workflow changes.
           </p>
           <Link
             to="/demo"
@@ -56,20 +56,20 @@ export function LandingPage() {
             The problem
           </p>
           <h2 className="text-2xl md:text-3xl tracking-tight font-bold mb-4 max-w-[600px]">
-            330,000 people in Finland have COPD<br />and nearly half don't know it.
+            300,000+ people in Finland have COPD<br />and most don't know it.
           </h2>
           <p className="text-muted-foreground leading-relaxed mb-12">
-            With a prevalence of 6% among the adult population, COPD is one of Finland's most underdiagnosed chronic diseases. Undiagnosed cases result in diminished quality of life and higher healthcare costs, driven by preventable hospitalizations and treatments at later stages. Despite the availability of diagnostic tools, many cases remain unidentified due to symptom overlap with other conditions, as well as insufficient awareness and clinical attention to the disease.
+            With a prevalence of 6% among the adult population, COPD is one of Finland's most underdiagnosed chronic diseases. Undiagnosed cases result in diminished quality of life and higher healthcare costs, driven by preventable hospitalizations and treatments at later stages. Despite the availability of diagnostic tools, many cases remain unidentified.
           </p>
 
           {/* Three numbers */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
             <div>
               <span className="text-4xl font-black leading-none">
-                280,000+
+                300,000+
               </span>
               <p className="text-sm text-muted-foreground mt-2">
-                estimated undiagnosed: 330,000 prevalent cases, but only 50,000 actively treated
+                300,000+ cases, but a maximum of 50,000 actively treated
               </p>
               <Cite src={CITATIONS.kotaniemi} />
             </div>
@@ -137,7 +137,7 @@ export function LandingPage() {
 
           {/* Chevron bar. 4 phases */}
           <div className="grid grid-cols-4 mb-0 overflow-hidden rounded-t-lg">
-            {['Patient', 'Doctor', 'Digital Systems', 'Operational Layer'].map((label, i) => (
+            {['Patient', 'Doctor', 'Digital Systems', 'Secondary Layer'].map((label, i) => (
               <div
                 key={label}
                 className="relative text-white text-xs font-bold px-3 py-2.5 text-center flex items-center justify-center min-h-[44px]"
