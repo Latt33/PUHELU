@@ -211,7 +211,7 @@ var TIPS = {
   annualProb:['Annual screening probability','Probability a patient completes screening at least once during the year, given multiple visits. Compounds across ~3 opportunities.','1 \u2212 (1 \u2212 per-SMS rate) ^ visits/yr'],
   screened:['Unique patients screened per year','Patients who complete screening at least once this year. Higher than single-SMS conversion because of ~3 opportunities per year.','Eligible \u00D7 Annual screening probability'],
   copdInPool:['COPD cases in pool','Estimated patients in the screened pool who actually have COPD, whether diagnosed or not. Applied as a flat prevalence rate.','Screened \u00D7 Prevalence rate'],
-  undiagnosed:['Undiagnosed in pool','70% of COPD cases are undiagnosed (Diab et al., AJRCCM 2018: 70\u201380% globally; OLIN Sweden: 50\u201370%; Hvidsten Norway: 70%). Previous model used 49% from Kotaniemi 2005 (Finnish, but outdated and most conservative available). Finnish treatment data corroborates: 330k prevalence vs 25\u201350k treated = 85\u201392% not on therapy.','COPD in pool \u00D7 70% (Diab et al. 2018)'],
+  undiagnosed:['Undiagnosed in pool','75% of COPD cases have no diagnosis in EHR. Derived directly from Finnish data: 330,000 COPD prevalence (6% of adults, Kotaniemi 2005) minus 25\u201350k actively treated (Kela prescription registry) minus an estimated 30\u201350k diagnosed-but-untreated = ~230\u2013250k truly undiagnosed = 70\u201376%. Using 75%. This is the population PUHELU can detect \u2014 patients whose EHR has no COPD flag.','COPD in pool \u00D7 75% (Finnish prevalence vs prescription data)'],
   truePos:['Correctly flagged','Undiagnosed COPD patients the screening correctly identifies as at-risk.','Undiagnosed \u00D7 Sensitivity'],
   falsePos:['False positives flagged','Non-COPD patients incorrectly flagged. These generate unnecessary spirometry referrals and can erode physician trust if too high.','(Screened \u2212 COPD cases) \u00D7 (1 \u2212 Specificity)'],
   spiroTP:['Spirometry referrals (TP)','True positive flags where the physician followed through with a spirometry order.','Correctly flagged \u00D7 Physician engagement'],
@@ -253,7 +253,7 @@ var CONSTANTS={
   uniquePatients:90000,         // unique smoking-exposed patients visiting Apotti primary care/yr. Apotti PRIMARY CARE covers ~970k (Helsinki 684k + Vantaa 245k + Kerava 40k) — NOT 1.7M (that includes HUS specialist care). 970k × 30% smoking × ~75% visit public PC (Helsinki lower due to occupational health) ÷ 2.5 visits = ~87k, rounded to 90k. ~20% of smoking-exposed adults never visit (avoidance, shame, distrust).
   visitsPerYear:2.5,            // SCHEDULED primary care doctor appointments generating SMS. Eurostat 4.4 total → ~2.6-3.1 GP only → Helsinki 25-30% lower → ~2.0-2.2 → smokers 1.5× higher → ~3.0 → minus acute/walk-in/phone (no SMS) → ~2.5
   smsDelivery:0.92,             // SMS delivery rate
-  undiagnosedFraction:0.60,     // Finnish midpoint: Kotaniemi 2005 (49%) is floor, Diab 2018 (70-80%) is global. Finland has better primary care than global avg but still significant underdiagnosis. 60% balances Finnish-specific and international evidence.
+  undiagnosedFraction:0.75,     // Derived from Finnish data: 330k COPD prevalence (6%, Kotaniemi 2005), 25-50k actively treated (Kela prescription data). Even assuming 30-50k diagnosed-but-untreated, ~230-250k have no EHR diagnosis = 70-76%. Using 75%.
   spirometryConfirmation:0.80,  // spirometry confirms COPD in true-positive referrals
   spirometryCost:154,           // EUR per spirometry: 110 × 1.4 inflation adj from 2010 to 2024 (Viinanen 2019 base)
   acuteCarePerPatient:713,      // EUR/yr: (450+59) × 1.4 inflation adj from 2010 to 2024. Cross-check: ARCTIC study (Lisspers 2018) found €1,278/yr — our figure is still conservative
@@ -512,7 +512,7 @@ function renderFunnel(r){
    ['Annual screening probability',pctAnn+'%','annualProb'],
    ['Unique patients screened / year',fmt(r.screened),'screened'],
    ['COPD cases in pool',fmt(r.copdInPool),'copdInPool'],
-   ['Undiagnosed in pool (60%)',fmt(r.undiagnosed),'undiagnosed'],
+   ['Undiagnosed — no EHR diagnosis (75%)',fmt(r.undiagnosed),'undiagnosed'],
    ['Spirometry referrals (true positive)',fmt(r.spiroTrue),'spiroTP'],
    ['Spirometry referrals (false positive)',fmt(fpSpiroAfterFilter),'spiroFP'],
    ['Flag positive predictive value',ppv+'%','ppv'],
