@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { PuheluLogo } from '../components/PuheluLogo';
-import {
-  INVESTMENT, FUNNEL, RETURNS, EPI, CITATIONS, eurFmt,
-} from '../data/model';
+import { CITATIONS } from '../data/model';
 
 
 function Cite({ src }: { src: { label: string; url: string } }) {
@@ -58,51 +56,51 @@ export function LandingPage() {
             The problem
           </p>
           <h2 className="text-2xl md:text-3xl tracking-tight font-bold mb-4 max-w-[600px]">
-            {EPI.undiagnosedHelsinki.toLocaleString()} people in Helsinki have COPD and don't know it.
+            330,000 people in Finland have COPD<br />and nearly half don't know it.
           </h2>
-          <p className="text-muted-foreground leading-relaxed mb-12 max-w-[540px]">
-            They'll find out in an emergency room. By then, treatment is expensive, outcomes are worse, and years of manageable disease have been lost. The diagnostic tools exist — what's missing is a reason to use them before symptoms become a crisis.
+          <p className="text-muted-foreground leading-relaxed mb-12">
+            With a prevalence of 6% among the adult population, COPD is one of Finland's most underdiagnosed chronic diseases. Undiagnosed cases result in diminished quality of life and higher healthcare costs, driven by preventable hospitalizations and treatments at later stages. Despite the availability of diagnostic tools, many cases remain unidentified due to symptom overlap with other conditions, as well as insufficient awareness and clinical attention to the disease.
           </p>
 
           {/* Three numbers */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
             <div>
               <span className="text-4xl font-black leading-none">
-                {EPI.undiagnosedHelsinki.toLocaleString()}
+                280,000+
               </span>
               <p className="text-sm text-muted-foreground mt-2">
-                people in Helsinki living with undiagnosed COPD — half of all cases
+                estimated undiagnosed: 330,000 prevalent cases, but only 50,000 actively treated
               </p>
               <Cite src={CITATIONS.kotaniemi} />
             </div>
             <div>
               <span className="text-4xl font-black leading-none">
-                ~{FUNNEL.newDiagnoses.base}
+                1,000+
               </span>
               <p className="text-sm text-muted-foreground mt-2">
-                of them could be found each year through PUHELU — before their first hospitalisation
+                new diagnoses per year at national scale, before their first hospitalisation
               </p>
               <span className="text-xs text-muted-foreground/60">PUHELU financial model, base case</span>
             </div>
             <div>
               <span className="text-4xl font-black leading-none">
-                {eurFmt(RETURNS.netReturn5yr)}
+                €9M+
               </span>
               <p className="text-sm text-muted-foreground mt-2">
-                net savings over 5 years — fewer hospital stays, fewer emergency visits, and patients who stay in milder disease stages because they were caught early. From a {eurFmt(INVESTMENT.total.base)} investment that pays back in {RETURNS.paybackMonths} months.
+                estimated economic impact over 5 years, including reduced hospitalisations, lower treatment intensity, improved public health outcomes, and downstream effects on smoking cessation and disease management.
               </p>
             </div>
           </div>
 
-          {/* How it works — brief */}
+          {/* How it works. brief */}
           <div className="bg-white rounded-xl border border-muted p-6 md:p-8 mb-6">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">How it works</p>
             <div className="grid sm:grid-cols-4 gap-4">
               {[
-                'Patient gets their normal appointment SMS — with a short health form linked',
+                'Patient gets their normal appointment SMS, with a short health form linked',
                 'Smokers are routed to COPD-specific questions and a brief voice recording',
-                'Responses are scored transparently — each factor visible, no black box',
-                'When the score is high, a flag appears in the doctor\'s existing screen',
+                'Responses are scored transparently: each factor visible, no black box',
+                'When the score is high, a flag appears in the doctor\'s existing patient information system',
               ].map((step, i) => (
                 <div key={i} className="flex gap-3 sm:flex-col sm:gap-2">
                   <div className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground font-bold text-xs">
@@ -115,27 +113,128 @@ export function LandingPage() {
           </div>
 
           <p className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-5 leading-relaxed mb-6">
-            Nothing to buy, nothing to learn, nothing to change. Doctors keep doing what they already do — they just see a flag when a patient needs a closer look. The screening happens before anyone walks through the door.
+            No additional doctors, no new systems to interact with. Doctors keep doing what they already do, with the flag as a preliminary supplement to their diagnostic process.
           </p>
 
-          <Link
-            to="/business-case"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-primary transition-colors group"
-          >
-            Read the full business case and financial model
-            <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </Link>
+          <div className="text-center">
+            <a
+              href="/financial-model.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl text-primary-foreground bg-primary hover:bg-primary/90 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+            >
+              See the Financial Model
+              <ArrowUpRight className="ml-2 h-5 w-5" />
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* Stakeholder Mapping — placeholder */}
+      {/* Stakeholder Map */}
       <section className="py-20 px-6 md:px-8">
         <div className="mx-auto max-w-5xl">
-          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">
-            Stakeholders
-          </p>
-          <div className="rounded-xl border border-muted bg-muted/20 p-8 md:p-12 min-h-[300px] flex items-center justify-center">
-            <p className="text-muted-foreground/60 text-sm">Stakeholder mapping — content pending</p>
+          <h2 className="text-3xl md:text-4xl tracking-tight font-bold mb-8 text-center">Stakeholder Map</h2>
+
+          {/* Chevron bar. 4 phases */}
+          <div className="grid grid-cols-4 mb-0 overflow-hidden rounded-t-lg">
+            {['Patient', 'Doctor', 'Digital Systems', 'Operational Layer'].map((label, i) => (
+              <div
+                key={label}
+                className="relative text-white text-xs font-bold px-3 py-2.5 text-center flex items-center justify-center min-h-[44px]"
+                style={{ background: 'var(--primary)', ...(i === 3 ? { opacity: 0.7 } : {}) }}
+              >
+                <span className="relative z-10 leading-tight">{label}</span>
+                {i < 3 && (
+                  <div className="absolute right-0 top-0 bottom-0 w-4 z-20 flex items-center">
+                    <svg viewBox="0 0 16 44" className="h-full w-4" preserveAspectRatio="none">
+                      <polygon points="0,0 16,22 0,44" fill="var(--background)" />
+                    </svg>
+                  </div>
+                )}
+                {i > 0 && (
+                  <div className="absolute left-0 top-0 bottom-0 w-4 z-20 flex items-center">
+                    <svg viewBox="0 0 16 44" className="h-full w-4" preserveAspectRatio="none">
+                      <polygon points="0,0 16,22 0,44" fill="var(--primary)" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Main layout: table (left 75%) + side boxes (right 25%) */}
+          <div className="flex gap-0">
+            {/* Left: 3-column table with row labels */}
+            <div className="flex-1 min-w-0">
+              <table className="w-full text-xs border-collapse">
+                <tbody>
+                  {([
+                    {
+                      label: 'Role', tinted: true,
+                      patient: ['Completes form', 'Provides input data for flagging', 'Used for training data'],
+                      doctor: ['Receives a flagged summary', 'Uses the tool as a supplement', 'Decides on a follow up'],
+                      systems: ['Delivers form to patient', 'Processes voice and questionnaire', 'Sends output to doctor'],
+                    },
+                    {
+                      label: 'Impacts', tinted: false,
+                      patient: ['Earlier detection of COPD', 'Low effort screening', 'Reduced risk for late-stage illness and exacerbations'],
+                      doctor: ['Better pre-appointment information', 'Faster identification of at-risk patients', 'Reduced missed diagnoses'],
+                      systems: ['Enables scalable screening', 'Automates data collection'],
+                    },
+                    {
+                      label: 'Risks', tinted: true,
+                      patient: ['Privacy concerns', 'Lack of digital skills', 'Shame over lifestyle'],
+                      doctor: ['Extra workload', 'Distrust of AI', 'Authority issues'],
+                      systems: ['Data breaches', 'Complexity', 'Reliability'],
+                    },
+                    {
+                      label: 'Mitigants', tinted: false,
+                      patient: ['Clear communications on what the data is used for', 'Simple UI (Yes / No question)', 'No clear distinction for smokers'],
+                      doctor: ['Integrated into existing workflows', 'Clear summary', 'Legitimisation by a pulmonologist'],
+                      systems: ['Regulatory compliance', 'Cooperation with existing systems', 'Consulting service part of the service'],
+                    },
+                  ] as const).map((row) => (
+                    <tr key={row.label} className={row.tinted ? 'bg-primary/5' : ''}>
+                      <td className="py-3 pr-3 pl-1 font-bold text-foreground align-top border-b border-muted text-sm w-[90px]">
+                        {row.label}
+                      </td>
+                      {[row.patient, row.doctor, row.systems].map((items, ci) => (
+                        <td key={ci} className="py-3 px-3 align-top border-b border-muted">
+                          <ul className="space-y-1">
+                            {items.map((item) => (
+                              <li key={item} className="text-muted-foreground flex items-start gap-1.5">
+                                <span className="select-none mt-0.5">•</span>{item}
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Right: stacked layer boxes */}
+            <div className="w-[200px] flex-shrink-0 flex flex-col gap-4 pl-4 pt-2">
+              <div className="rounded-lg border border-muted p-4">
+                <p className="text-xs font-bold text-foreground mb-2">Operational Layer</p>
+                <ul className="space-y-1 text-xs text-muted-foreground">
+                  <li className="flex items-start gap-1.5"><span>›</span>Nurses</li>
+                  <li className="flex items-start gap-1.5"><span>›</span>Organisations (hospitals, clinics)</li>
+                  <li className="flex items-start gap-1.5"><span>›</span>Digital systems</li>
+                </ul>
+              </div>
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+                <p className="text-xs font-bold text-primary mb-2">Systemic Layer</p>
+                <ul className="space-y-1 text-xs text-muted-foreground">
+                  <li className="flex items-start gap-1.5"><span>›</span>Regulators</li>
+                  <li className="flex items-start gap-1.5"><span>›</span>Reimbursers (Kela)</li>
+                  <li className="flex items-start gap-1.5"><span>›</span>Society (public perception)</li>
+                  <li className="flex items-start gap-1.5"><span>›</span>Pharma companies</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -160,8 +259,8 @@ export function LandingPage() {
             ].map((phase, i) => (
               <div
                 key={phase.label}
-                className="relative bg-[#1a6b7a] text-white text-xs font-bold px-3 py-2.5 text-center flex items-center justify-center min-h-[44px]"
-                style={phase.last ? { background: '#1a6b7a', opacity: 0.75 } : undefined}
+                className="relative text-white text-xs font-bold px-3 py-2.5 text-center flex items-center justify-center min-h-[44px]"
+                style={{ background: 'var(--primary)', ...(phase.last ? { opacity: 0.7 } : {}) }}
               >
                 <span className="relative z-10 leading-tight">{phase.label}</span>
                 {!phase.last && (
@@ -174,7 +273,7 @@ export function LandingPage() {
                 {i > 0 && (
                   <div className="absolute left-0 top-0 bottom-0 w-4 z-20 flex items-center">
                     <svg viewBox="0 0 16 44" className="h-full w-4" preserveAspectRatio="none">
-                      <polygon points="0,0 16,22 0,44" fill="#1a6b7a" />
+                      <polygon points="0,0 16,22 0,44" fill="var(--primary)" />
                     </svg>
                   </div>
                 )}
@@ -201,7 +300,7 @@ export function LandingPage() {
           {/* Phase content */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
 
-            {/* Year 2027 — Pilot Study */}
+            {/* Year 2027. Pilot Study */}
             <div className="text-sm">
               <p className="font-bold mb-3">Goal: PUHELU Proof-of-Value</p>
 
@@ -240,7 +339,7 @@ export function LandingPage() {
               </ul>
             </div>
 
-            {/* Year 2028 — Technology and geography scaling */}
+            {/* Year 2028. Technology and geography scaling */}
             <div className="text-sm">
               <p className="font-bold mb-3">Goal: improve assessment accuracy to increase COPD diagnosis</p>
 
@@ -263,7 +362,7 @@ export function LandingPage() {
               </ul>
             </div>
 
-            {/* Year 2029 — Self-Assessment Tool */}
+            {/* Year 2029. Self-Assessment Tool */}
             <div className="text-sm">
               <p className="font-bold mb-3">Goal: target population that doesn't book doctor consultations</p>
 
@@ -274,7 +373,7 @@ export function LandingPage() {
               </ul>
             </div>
 
-            {/* Year 2030–2035 — Outlook */}
+            {/* Year 2030–2035. Outlook */}
             <div className="text-sm">
               <p className="font-bold mb-3">
                 Goal: use health data, incl. assessment questionnaires, to predict other diseases like neurological pathologies. By supporting doctors with excessive data handling in the first consultation, we aim to facilitate diagnosis and improve treatment outcomes
@@ -291,6 +390,39 @@ export function LandingPage() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* References */}
+      <section className="py-16 px-6 md:px-8 border-t border-muted">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-lg tracking-tight font-bold mb-6">References</h2>
+          <ol className="list-decimal list-outside pl-5 space-y-3 text-xs text-muted-foreground leading-relaxed">
+            <li>
+              Kotaniemi, J.-T., Lundback, B., Nieminen, M. M., Sovijarvi, A. R. A., &amp; Laitinen, L. A. (2005). Increase of prevalence of symptoms of asthma but not of chronic bronchitis in Finland 1970&ndash;2000. <em>Respiratory Medicine</em>, 99(1), 5&ndash;13.{' '}
+              <a href="https://www.tandfonline.com/doi/full/10.1080/15412550500218122" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:text-foreground transition-colors">doi:10.1080/15412550500218122</a>
+            </li>
+            <li>
+              Laru-Sompa, R., Kankaanranta, H., &amp; Kupiainen, H. (2020). Costs of COPD in Finland: a systematic review. <em>International Journal of COPD</em>, 15, 2859&ndash;2871.{' '}
+              <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6818542/" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:text-foreground transition-colors">PMC6818542</a>
+            </li>
+            <li>
+              Herse, F., Kiljander, T., &amp; Lehtimaki, L. (2015). Annual costs of chronic obstructive pulmonary disease in Finland during 1996&ndash;2006 and a prediction model for 2007&ndash;2030. <em>npj Primary Care Respiratory Medicine</em>, 25, 15015.{' '}
+              <a href="https://www.nature.com/articles/npjpcrm201515" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:text-foreground transition-colors">doi:10.1038/npjpcrm.2015.15</a>
+            </li>
+            <li>
+              Kinnula, V. L., Vasankari, T., Kontula, E., Sovijarvi, A., Saynajakangas, O., &amp; Pietinalho, A. (2011). The 10-year COPD programme in Finland: effects on quality of diagnosis, incidence, prevalence and mortality. <em>Primary Care Respiratory Journal</em>, 20(2), 178&ndash;183.{' '}
+              <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6549818/" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:text-foreground transition-colors">PMC6549818</a>
+            </li>
+            <li>
+              THL (2024). Tobacco statistics. Finnish Institute for Health and Welfare.{' '}
+              <a href="https://thl.fi/en/statistics-and-data/statistics-by-topic/alcohol-drugs-and-addiction/tobaccostatistics" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:text-foreground transition-colors">thl.fi</a>
+            </li>
+            <li>
+              Statista (2024). Number of health or hospital care visits in Finland.{' '}
+              <a href="https://www.statista.com/statistics/1538504/number-of-health-or-hospital-care-visits-in-finland/" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:text-foreground transition-colors">statista.com</a>
+            </li>
+          </ol>
         </div>
       </section>
 
