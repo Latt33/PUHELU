@@ -24,15 +24,23 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             raise
 
 
-# Setup CORS using settings
+# Setup CORS using settings.
+# For convenience during testing, if no CORS_ORIGINS are provided we allow all origins
+# (wildcard) but disable credentials to remain compatible with browser rules.
 if settings.CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin).strip("/") for origin in settings.CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    origins = [str(origin).strip("/") for origin in settings.CORS_ORIGINS]
+    allow_credentials = True
+else:
+    origins = ["*"]
+    allow_credentials = False
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=allow_credentials,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Install logging middleware early so all requests are captured
 app.add_middleware(RequestLoggingMiddleware)
