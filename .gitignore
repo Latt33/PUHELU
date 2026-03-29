@@ -39,6 +39,9 @@ out/
 data/
 src/backend/data/
 
+# Claude Code
+CLAUDE.md
+
 # Logs
 logs/
 *.log
