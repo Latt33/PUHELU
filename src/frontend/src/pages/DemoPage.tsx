@@ -74,9 +74,6 @@ export function DemoPage() {
   const [showIntro, setShowIntro] = useState(true);
   const [catIndex, setCatIndex] = useState(0);
 
-  const currentCatQuestion = CAT_QUESTIONS[catIndex];
-  const currentCatAnswered = patientData.catScores[currentCatQuestion.id] !== null;
-
   // Symptoms state
   const handleSymptomToggle = (symptom: string) => {
     if (patientData.symptoms.includes(symptom)) {
@@ -231,8 +228,6 @@ export function DemoPage() {
         cat_energy: patientData.catScores.cat_energy || 0,
         exacerbations_past_year: 0,
         hospitalized_past_year: false,
-        // Map smoking status string to boolean expected by backend
-        smoker_recent: (patientData.smokingStatus === 'Current')
       });
 
       // 2. Send Voice Data (if provided)
@@ -262,13 +257,13 @@ export function DemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8 relative">
+    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 relative">
       <AppHeader />
       <div className="max-w-3xl mx-auto relative">
         {step < 4 && (
           <Link 
             to="/" 
-            className="absolute -top-8 left-0 inline-flex items-center text-sm font-medium text-slate-700 hover:text-slate-800 transition-colors"
+            className="absolute -top-8 left-0 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="mr-1 h-4 w-4" /> Back to Home
           </Link>
@@ -276,21 +271,21 @@ export function DemoPage() {
 
         {/* Header and Step Progress */}
           <header className="mb-10 text-center">
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 mb-2">Patient Intake</h1>
-          <p className="text-slate-700">PUHELU</p>
+          <h1 className="text-3xl font-black tracking-tight text-foreground mb-2">Patient Intake</h1>
+          <p className="text-muted-foreground">PUHELU</p>
         </header>
 
         {/* Removed numbered patient-facing progress per design. Intro guides user, then sequential questions. */}
 
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 min-h-[500px] flex flex-col">
+        <div className="bg-white rounded-lg shadow-sm border border-muted p-8 min-h-[500px] flex flex-col">
           
           {/* INTRO */}
           {showIntro && (
             <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <h2 className="text-2xl font-bold text-slate-800 mb-4">Demo Health Survey</h2>
-              <p className="text-slate-700 max-w-xl mb-8">This is a demo health survey that will be used to map general health status and screen for COPD. You'll be asked one question at a time.</p>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Demo Health Survey</h2>
+              <p className="text-muted-foreground max-w-xl mb-8">This is a demo health survey that will be used to map general health status and screen for COPD. You'll be asked one question at a time.</p>
               <div className="flex gap-3">
-                <button onClick={() => setShowIntro(false)} className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-md">Start Survey</button>
+                <button onClick={() => setShowIntro(false)} className="bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-md">Start Survey</button>
               </div>
             </div>
           )}
@@ -298,24 +293,24 @@ export function DemoPage() {
           {/* STEP 0: SYMPTOMS */}
           {step === 0 && !showIntro && (
             <div className="flex-1 animate-fade-in flex flex-col">
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Current Symptoms</h2>
-              <p className="text-slate-700 mb-8">Select all the symptoms you are experiencing right now.</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Current Symptoms</h2>
+              <p className="text-muted-foreground mb-8">Select all the symptoms you are experiencing right now.</p>
               
               <div className="space-y-3 mb-8 flex-1">
                 {SYMPTOM_OPTIONS.map(sym => (
-                  <label key={sym} className="flex items-center p-4 rounded-md border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors">
+                  <label key={sym} className="flex items-center p-4 rounded-md border border-muted cursor-pointer hover:bg-muted/30 transition-colors">
                     <input
                       type="checkbox"
                       checked={patientData.symptoms.includes(sym)}
                       onChange={() => handleSymptomToggle(sym)}
-                      className="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                      className="w-5 h-5 text-primary rounded border-muted focus:ring-primary"
                     />
-                    <span className="ml-3 font-medium text-slate-700">{sym}</span>
+                    <span className="ml-3 font-medium text-muted-foreground">{sym}</span>
                   </label>
                 ))}
                 
-                <div className="p-4 rounded-md border border-slate-200 flex flex-col gap-2 bg-slate-50">
-                  <label className="flex items-center text-slate-700 font-medium">
+                <div className="p-4 rounded-md border border-muted flex flex-col gap-2 bg-muted/30">
+                  <label className="flex items-center text-muted-foreground font-medium">
                     <Plus className="w-4 h-4 mr-2" /> Other symptoms
                   </label>
                   <input
@@ -323,15 +318,15 @@ export function DemoPage() {
                     value={patientData.otherSymptom}
                     onChange={(e) => setOtherSymptom(e.target.value)}
                     placeholder="Describe any other symptoms here..."
-                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-white border border-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
 
-                <div className="mt-auto flex justify-end border-t border-slate-100 pt-6">
+                <div className="mt-auto flex justify-end border-t border-muted/50 pt-6">
                 <button
                   onClick={() => setStep(1)}
-                  className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  className="bg-primary text-primary-foreground font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
                 >
                   Continue <ArrowRight size={20} />
                 </button>
@@ -342,8 +337,8 @@ export function DemoPage() {
           {/* STEP 1: Smoking question */}
           {step === 1 && (
             <div className="flex-1 animate-fade-in flex flex-col">
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Smoking Status</h2>
-              <p className="text-slate-700 mb-6">Please select the option that best describes your smoking history.</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Smoking Status</h2>
+              <p className="text-muted-foreground mb-6">Please select the option that best describes your smoking history.</p>
 
               <div className="flex-1 flex flex-col items-center justify-center">
                 <div className="w-full max-w-md space-y-3">
@@ -351,7 +346,7 @@ export function DemoPage() {
                     <button
                       key={opt}
                       onClick={() => setSmokingStatus(opt)}
-                      className={`w-full py-4 rounded-lg font-semibold border ${patientData.smokingStatus === opt ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+                      className={`w-full py-4 rounded-lg font-semibold border ${patientData.smokingStatus === opt ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-muted-foreground border-muted hover:bg-muted/30'}`}
                     >
                       {opt}
                     </button>
@@ -359,10 +354,10 @@ export function DemoPage() {
                 </div>
               </div>
 
-                <div className="mt-6 flex justify-between pt-6 border-t border-slate-100">
+              <div className="mt-6 flex justify-between pt-6 border-t border-muted/50">
                 <button
                   onClick={() => setStep(0)}
-                  className="text-slate-700 font-medium py-3 px-6 rounded-md hover:bg-slate-100 transition-colors"
+                  className="text-muted-foreground font-medium py-3 px-6 rounded-md hover:bg-muted transition-colors"
                 >
                   Back
                 </button>
@@ -371,7 +366,7 @@ export function DemoPage() {
                     setCatIndex(0);
                     setStep(2);
                   }}
-                  className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  className="bg-primary text-primary-foreground font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
                 >
                   Continue <ArrowRight size={20} />
                 </button>
@@ -389,9 +384,9 @@ export function DemoPage() {
                   const q = CAT_QUESTIONS[catIndex];
                   const selected = patientData.catScores[q.id];
                   return (
-                    <div key={q.id} className="w-full max-w-2xl bg-slate-50 rounded-md p-6 border border-slate-200">
-                      <h3 className="text-center font-bold text-slate-800 mb-4">{q.label}</h3>
-                      <div className="flex justify-between items-end mb-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                    <div key={q.id} className="w-full max-w-2xl bg-muted/30 rounded-md p-6 border border-muted">
+                      <h3 className="text-center font-bold text-foreground mb-4">{q.label}</h3>
+                      <div className="flex justify-between items-end mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                         <div className="w-1/3 text-left leading-tight">{q.minLabel}</div>
                         <div className="w-1/3 text-right leading-tight">{q.maxLabel}</div>
                       </div>
@@ -400,10 +395,15 @@ export function DemoPage() {
                           <button
                             key={score}
                             onClick={() => {
-                              // only set the selected score; do NOT advance automatically
                               setCatScore(q.id, score);
+                              // auto-advance to next question, or to voice step if last
+                              if (catIndex < CAT_QUESTIONS.length - 1) {
+                                setCatIndex(prev => prev + 1);
+                              } else {
+                                setStep(3);
+                              }
                             }}
-                            className={`flex-1 py-3 sm:py-4 text-lg font-bold rounded-lg transition-all ${selected === score ? 'bg-blue-600 text-white shadow-md transform scale-105 border-blue-600' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}
+                            className={`flex-1 py-3 sm:py-4 text-lg font-bold rounded-lg transition-all ${selected === score ? 'bg-primary text-primary-foreground shadow-md transform scale-105 border-primary' : 'bg-white text-muted-foreground border border-muted hover:bg-muted hover:border-muted'}`}
                           >
                             {score}
                           </button>
@@ -414,13 +414,13 @@ export function DemoPage() {
                 })()}
               </div>
 
-              <div className="mt-6 flex justify-between pt-6 border-t border-slate-100">
+              <div className="mt-6 flex justify-between pt-6 border-t border-muted/50">
                 <button
                   onClick={() => {
                     if (catIndex === 0) setStep(1);
                     else setCatIndex(prev => Math.max(0, prev - 1));
                   }}
-                  className="text-slate-700 font-medium py-3 px-6 rounded-md hover:bg-slate-100 transition-colors"
+                  className="text-muted-foreground font-medium py-3 px-6 rounded-md hover:bg-muted transition-colors"
                 >
                   Back
                 </button>
@@ -437,8 +437,7 @@ export function DemoPage() {
                       setStep(3);
                     }
                   }}
-                  disabled={!currentCatAnswered}
-                  className={`${currentCatAnswered ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-300 text-slate-600 cursor-not-allowed'} font-semibold py-3 px-8 rounded-md transition-colors flex items-center gap-2`}
+                  className="bg-primary text-primary-foreground font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
                 >
                   Continue <ArrowRight size={20} />
                 </button>
@@ -449,30 +448,30 @@ export function DemoPage() {
           {/* STEP 3: VOICE RECORDING */}
           {step === 3 && (
             <div className="flex-1 animate-fade-in flex flex-col">
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Vocal Biomarker</h2>
-              <div className="bg-blue-50 border border-blue-100 p-5 rounded-md mb-8">
-                <p className="text-blue-900 font-medium mb-2">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Vocal Biomarker</h2>
+              <div className="bg-primary/5 border border-primary/10 p-5 rounded-md mb-8">
+                <p className="text-foreground font-medium mb-2">
                   <strong>Voice recording guidance:</strong>
                 </p>
-                <p className="text-blue-800">
+                <p className="text-foreground">
                   Please produce a long, steady vowel sound (for example, "ahhh") while keeping your mouth about a palm's length away from the microphone.
                 </p>
               </div>
               
               <div className="flex-1 flex flex-col items-center justify-center">
                 {!patientData.voiceFile ? (
-                  <div className="flex flex-col items-center w-full max-w-md bg-slate-50 p-10 rounded-lg border-2 border-dashed border-slate-300">
+                  <div className="flex flex-col items-center w-full max-w-md bg-muted/30 p-10 rounded-lg border-2 border-dashed border-muted">
                     
                     {!isRecording && !isPreparing && (
                       <div className="w-full mb-8">
-                        <label className="flex items-start p-4 bg-white rounded-md border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors shadow-sm">
+                        <label className="flex items-start p-4 bg-white rounded-md border border-muted cursor-pointer hover:bg-muted transition-colors shadow-sm">
                           <input
                             type="checkbox"
                             checked={consentGiven}
                             onChange={(e) => setConsentGiven(e.target.checked)}
-                            className="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                            className="mt-1 w-5 h-5 text-primary rounded border-muted focus:ring-primary"
                           />
-                          <span className="ml-3 text-sm text-slate-700 leading-relaxed font-medium">
+                          <span className="ml-3 text-sm text-muted-foreground leading-relaxed font-medium">
                             I consent to the collection and processing of my voice recording for medical analysis purposes.
                           </span>
                         </label>
@@ -481,21 +480,21 @@ export function DemoPage() {
 
                     {isPreparing ? (
                       <>
-                        <div className="w-24 h-24 bg-blue-100 rounded-md flex items-center justify-center mb-6 shadow-inner">
-                          <span className="text-4xl font-black text-blue-600">{countdown}</span>
+                        <div className="w-24 h-24 bg-primary/10 rounded-md flex items-center justify-center mb-6 shadow-inner">
+                          <span className="text-4xl font-black text-primary">{countdown}</span>
                         </div>
-                        <p className="text-xl text-center text-slate-800 font-bold mb-2">Get ready...</p>
-                        <p className="text-center text-slate-700 mb-8 font-medium">Take a deep breath now.</p>
+                        <p className="text-xl text-center text-foreground font-bold mb-2">Get ready...</p>
+                        <p className="text-center text-muted-foreground mb-8 font-medium">Take a deep breath now.</p>
                       </>
                     ) : isRecording ? (
                       <>
                         <div className="w-24 h-24 bg-red-100 rounded-md flex items-center justify-center mb-6 animate-pulse shadow-inner">
                           <Mic className="w-10 h-10 text-red-600" />
                         </div>
-                        <div className="text-4xl font-mono font-bold text-slate-800 mb-2">
+                        <div className="text-4xl font-mono font-bold text-foreground mb-2">
                           00:{recordingDuration.toString().padStart(2, '0')}
                         </div>
-                        <p className="text-sm mb-4 font-medium text-slate-700">
+                        <p className="text-sm mb-4 font-medium text-muted-foreground">
                           Recording... {Math.max(0, 6 - recordingDuration)}s remaining
                         </p>
                         <div className="w-full h-3 bg-slate-200 rounded-md overflow-hidden mb-6 shadow-inner">
@@ -507,14 +506,14 @@ export function DemoPage() {
                       </>
                     ) : (
                       <>
-                        <div className="w-24 h-24 bg-white rounded-md flex items-center justify-center mb-6 shadow-sm border border-slate-100">
-                          <Mic className={`w-10 h-10 ${consentGiven ? 'text-blue-600' : 'text-slate-300'}`} />
+                        <div className="w-24 h-24 bg-white rounded-md flex items-center justify-center mb-6 shadow-sm border border-muted/50">
+                          <Mic className={`w-10 h-10 ${consentGiven ? 'text-primary' : 'text-muted-foreground/40'}`} />
                         </div>
-                        <p className="text-center text-slate-700 mb-8 font-medium">Ready to record</p>
+                        <p className="text-center text-muted-foreground mb-8 font-medium">Ready to record</p>
                         <button 
                           onClick={startRecording}
                           disabled={!consentGiven}
-                          className="w-full bg-blue-600 text-white font-bold py-4 px-8 rounded-md hover:bg-blue-700 transition-colors text-lg flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full bg-primary text-primary-foreground font-bold py-4 px-8 rounded-md hover:bg-primary/90 transition-colors text-lg flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Mic size={24} /> Start Recording
                         </button>
@@ -523,14 +522,14 @@ export function DemoPage() {
                     {recordingError && <p className="mt-4 text-red-500 text-sm font-medium bg-red-50 p-3 rounded-lg w-full text-center border border-red-100">{recordingError}</p>}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center w-full max-w-md bg-slate-50 p-8 rounded-lg border border-slate-200">
+                  <div className="flex flex-col items-center w-full max-w-md bg-muted/30 p-8 rounded-lg border border-muted">
                     <div className="w-16 h-16 bg-green-100 rounded-md flex items-center justify-center mb-4">
                       <Check className="w-8 h-8 text-green-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-2">Recording Successful</h3>
-                    <p className="text-slate-700 mb-6 font-medium">Duration: {recordingDuration} seconds</p>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Recording Successful</h3>
+                    <p className="text-muted-foreground mb-6 font-medium">Duration: {recordingDuration} seconds</p>
                     
-                    <div className="w-full bg-white p-4 rounded-md border border-slate-100 mb-6 shadow-sm">
+                    <div className="w-full bg-white p-4 rounded-md border border-muted/50 mb-6 shadow-sm">
                       <audio src={patientData.voiceUrl!} controls className="w-full" />
                     </div>
                     
@@ -539,7 +538,7 @@ export function DemoPage() {
                         setVoiceData(null as any, null as any);
                         setRecordingDuration(0);
                       }}
-                      className="text-slate-700 font-medium hover:text-slate-800 transition-colors"
+                      className="text-muted-foreground font-medium hover:text-foreground transition-colors"
                     >
                       Retake recording
                     </button>
@@ -547,10 +546,10 @@ export function DemoPage() {
                 )}
               </div>
 
-              <div className="mt-2 flex justify-between pt-6 border-t border-slate-100">
+              <div className="mt-2 flex justify-between pt-6 border-t border-muted/50">
                 <button
                   onClick={() => setStep(2)}
-                  className="text-slate-700 font-medium py-3 px-6 rounded-md hover:bg-slate-100 transition-colors"
+                  className="text-muted-foreground font-medium py-3 px-6 rounded-md hover:bg-muted transition-colors"
                 >
                   Back
                 </button>
@@ -558,7 +557,7 @@ export function DemoPage() {
                   {!patientData.voiceFile && (
                     <button
                       onClick={handleSubmit}
-                      className="text-blue-600 font-medium py-3 px-6 rounded-md hover:bg-blue-50 transition-colors"
+                      className="text-primary font-medium py-3 px-6 rounded-md hover:bg-primary/5 transition-colors"
                     >
                       Skip Recording
                     </button>
@@ -569,7 +568,7 @@ export function DemoPage() {
                     className={`font-semibold py-3 px-8 rounded-md transition-colors flex items-center gap-2 shadow-sm ${
                       patientData.voiceFile
                         ? 'bg-green-600 text-white hover:bg-green-700'
-                        : 'bg-slate-200 text-slate-600 cursor-not-allowed'
+                        : 'bg-slate-200 text-muted-foreground cursor-not-allowed'
                     }`}
                   >
                     Submit Questionnaire <Check size={20} />
@@ -584,17 +583,17 @@ export function DemoPage() {
             <div className="flex-1 animate-fade-in flex flex-col items-center justify-center text-center">
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-6" />
-                  <h2 className="text-2xl font-bold text-slate-800 mb-2">Submitting Questionnaire...</h2>
-                  <p className="text-slate-500">Securely sending your responses to your care team.</p>
+                  <Loader2 className="w-16 h-16 text-primary animate-spin mb-6" />
+                  <h2 className="text-2xl font-bold text-foreground mb-2">Submitting Questionnaire...</h2>
+                  <p className="text-muted-foreground">Securely sending your responses to your care team.</p>
                 </>
               ) : (
                 <>
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                     <Check className="w-10 h-10 text-green-600" />
                   </div>
-                  <h2 className="text-3xl font-bold text-slate-800 mb-4">Questionnaire Submitted</h2>
-                  <p className="text-lg text-slate-600 mb-10 max-w-md">
+                  <h2 className="text-3xl font-bold text-foreground mb-4">Questionnaire Submitted</h2>
+                  <p className="text-lg text-muted-foreground mb-10 max-w-md">
                     Thank you. Your responses have been successfully sent and will be reviewed by your clinician prior to your appointment.
                   </p>
                   

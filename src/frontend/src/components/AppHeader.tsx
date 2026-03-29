@@ -1,34 +1,23 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Home, Menu, X } from 'lucide-react';
 
 export const AppHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
 
   return (
     <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-      {location.pathname === '/' ? (
-        <Link 
-          to="/" 
-          className="flex items-center justify-center w-12 h-12 bg-white rounded-md shadow-md text-slate-800 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-          aria-label="Home"
-        >
-          <Home className="h-6 w-6" />
-        </Link>
-      ) : (
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
-          aria-label="Back to Main"
-        >
-          Back to Main
-        </Link>
-      )}
+      <Link 
+        to="/" 
+        className="flex items-center justify-center w-12 h-12 bg-white rounded-md shadow-md text-foreground hover:bg-muted hover:text-foreground transition-colors"
+        aria-label="Home"
+      >
+        <Home className="h-6 w-6" />
+      </Link>
       <div className="relative">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="flex items-center justify-center w-12 h-12 bg-white rounded-md shadow-md text-slate-800 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+          className="flex items-center justify-center w-12 h-12 bg-white rounded-md shadow-md text-foreground hover:bg-muted hover:text-foreground transition-colors"
           aria-label="Open menu"
         >
           {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -38,14 +27,14 @@ export const AppHeader = () => {
             <div className="py-1">
               <Link
                 to="/demo"
-                className="block px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                className="block px-4 py-3 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Patient Intake Demo
               </Link>
               <Link
                 to="/clinician"
-                className="block px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                className="block px-4 py-3 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Clinician Dashboard

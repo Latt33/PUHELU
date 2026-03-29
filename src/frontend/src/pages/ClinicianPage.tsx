@@ -26,28 +26,28 @@ export function ClinicianPage() {
   // If there's no real data and we're not showing mock data, show the options page
   if (!patientData.clinicalResult && !patientData.voiceResult && !showMockData) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8 text-center">
         <div className="max-w-md">
-            <Stethoscope className="w-16 h-16 text-blue-500 mx-auto mb-6"/>
-            <h2 className="text-3xl font-black text-slate-800 mb-4">Clinician Dashboard</h2>
-            <p className="text-slate-600 mb-8">
+            <Stethoscope className="w-16 h-16 text-primary mx-auto mb-6"/>
+            <h2 className="text-3xl font-black text-foreground mb-4">Clinician Dashboard</h2>
+            <p className="text-muted-foreground mb-8">
             No active patient data found. To view this dashboard, you can either go through the patient intake process or load a sample high-risk patient profile.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
                 to="/demo"
-                className="w-full sm:w-auto flex-1 bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors shadow-sm"
+                className="w-full sm:w-auto flex-1 bg-primary text-white font-bold py-3 px-6 rounded-xl hover:bg-primary/90 transition-colors shadow-sm"
             >
                 Go to Patient Intake
             </Link>
             <button
                 onClick={() => setShowMockData(true)}
-                className="w-full sm:w-auto flex-1 bg-white text-slate-700 font-bold py-3 px-6 rounded-xl hover:bg-slate-100 transition-colors border border-slate-300 shadow-sm"
+                className="w-full sm:w-auto flex-1 bg-white text-muted-foreground font-bold py-3 px-6 rounded-xl hover:bg-muted transition-colors border border-muted shadow-sm"
             >
                 View Mock Data
             </button>
             </div>
-            <Link to="/" className="text-slate-500 hover:text-slate-800 mt-8 inline-block font-medium">
+            <Link to="/" className="text-muted-foreground hover:text-foreground mt-8 inline-block font-medium">
                 Back to Main Page
             </Link>
         </div>
@@ -102,37 +102,37 @@ export function ClinicianPage() {
 
   const aiRisk = voiceResult?.risk_score ?? null;
   const aiContainerClass = aiRisk === null
-    ? 'bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center'
+    ? 'bg-muted/30 p-5 rounded-xl border border-muted shadow-sm flex flex-col justify-center'
     : aiRisk >= 90
       ? 'bg-red-50 p-5 rounded-xl border-2 border-red-200 shadow-sm flex flex-col justify-center'
       : aiRisk > 80
         ? 'bg-amber-50 p-5 rounded-xl border-2 border-amber-200 shadow-sm flex flex-col justify-center'
-        : 'bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center';
+        : 'bg-muted/30 p-5 rounded-xl border border-muted shadow-sm flex flex-col justify-center';
 
   const aiNumberClass = aiRisk === null
-    ? 'text-slate-900 text-4xl font-black'
+    ? 'text-foreground text-4xl font-black'
     : aiRisk >= 90
       ? 'text-red-700 text-4xl font-black'
       : aiRisk > 80
         ? 'text-amber-700 text-4xl font-black'
-        : 'text-slate-900 text-4xl font-black';
+        : 'text-foreground text-4xl font-black';
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-8 pb-32 relative">
+    <div className="min-h-screen bg-background text-foreground p-4 sm:p-8 pb-32 relative">
       <AppHeader />
       <div className="max-w-6xl mx-auto space-y-12">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-6 border-b-2 border-slate-200">
+        <div className="flex items-center justify-between pb-6 border-b-2 border-muted">
           <div className="flex items-center gap-4">
-            <Link to="/demo" className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-600">
+            <Link to="/demo" className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-muted-foreground">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-4xl font-black tracking-tight flex items-center gap-3 text-slate-900">
-                <Stethoscope className="text-blue-600 w-10 h-10" /> Clinician Dashboard
+              <h1 className="text-4xl font-black tracking-tight flex items-center gap-3 text-foreground">
+                <Stethoscope className="text-primary w-10 h-10" /> Clinician Dashboard
               </h1>
-              <p className="text-base text-slate-600 font-medium mt-1">Patient ID: #8492-B • Pre-appointment screening</p>
+              <p className="text-base text-muted-foreground font-medium mt-1">Patient ID: #8492-B • Pre-appointment screening</p>
             </div>
           </div>
 
@@ -143,41 +143,41 @@ export function ClinicianPage() {
         {/* SECTION 1: Questionnaire Assessment */}
         <section>
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-slate-900">
+            <h2 className="text-2xl font-black text-foreground">
               1. Patient Reported Assessment
             </h2>
-            <p className="text-base text-slate-600 font-medium ml-0">Based on the pre-appointment digital intake questionnaire.</p>
+            <p className="text-base text-muted-foreground font-medium ml-0">Based on the pre-appointment digital intake questionnaire.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ml-10">
             {/* Symptoms */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2"><Activity className="w-5 h-5"/> Reported Symptoms</h3>
+            <div className="bg-white p-6 rounded-2xl border border-muted shadow-sm flex flex-col">
+              <h3 className="text-sm font-black text-foreground uppercase tracking-wider mb-5 flex items-center gap-2"><Activity className="w-5 h-5"/> Reported Symptoms</h3>
               <ul className="space-y-3 flex-1 overflow-y-auto max-h-[250px] pr-2 custom-scrollbar">
                 {symptoms.length === 0 && !otherSymptom && (
-                  <li className="text-slate-400 text-base italic">No symptoms reported.</li>
+                  <li className="text-muted-foreground/60 text-base italic">No symptoms reported.</li>
                 )}
                 {symptoms.map(s => (
-                  <li key={s} className="flex items-start text-lg font-bold text-slate-800">
+                  <li key={s} className="flex items-start text-lg font-bold text-foreground">
                     <span className="text-red-500 mr-3 text-xl leading-none">•</span> {s}
                   </li>
                 ))}
                 {otherSymptom && (
-                  <li className="flex items-start text-lg font-bold text-slate-800">
-                    <span className="text-red-500 mr-3 text-xl leading-none">•</span> {otherSymptom} <span className="text-slate-400 font-medium text-sm ml-2">(Other)</span>
+                  <li className="flex items-start text-lg font-bold text-foreground">
+                    <span className="text-red-500 mr-3 text-xl leading-none">•</span> {otherSymptom} <span className="text-muted-foreground/60 font-medium text-sm ml-2">(Other)</span>
                   </li>
                 )}
               </ul>
             </div>
 
             {/* CAT Breakdown */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-5">CAT Answers</h3>
+            <div className="bg-white p-6 rounded-2xl border border-muted shadow-sm flex flex-col">
+              <h3 className="text-sm font-black text-foreground uppercase tracking-wider mb-5">CAT Answers</h3>
               <div className="grid grid-cols-1 gap-3 overflow-y-auto max-h-[250px] pr-2 custom-scrollbar">
                 {Object.entries(catScores).map(([key, score]) => (
-                  <div key={key} className="flex justify-between items-center text-base border-b border-slate-100 pb-2 last:border-0">
-                    <span className="text-slate-700 font-semibold">{CAT_LABELS[key] || key}</span>
-                    <span className={`font-black px-3 py-1 rounded-md ${(score || 0) >= 3 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'}`}>
+                  <div key={key} className="flex justify-between items-center text-base border-b border-muted/50 pb-2 last:border-0">
+                    <span className="text-muted-foreground font-semibold">{CAT_LABELS[key] || key}</span>
+                    <span className={`font-black px-3 py-1 rounded-md ${(score || 0) >= 3 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-muted-foreground'}`}>
                       {score || 0}/5
                     </span>
                   </div>
@@ -186,10 +186,10 @@ export function ClinicianPage() {
             </div>
 
             {/* CAT Total */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-4">Total CAT Score</h3>
-              <div className="text-7xl font-black text-slate-900 tracking-tighter mb-4">
-                {totalCatScore}<span className="text-3xl text-slate-400 font-semibold tracking-normal">/40</span>
+            <div className="bg-white p-6 rounded-2xl border border-muted shadow-sm flex flex-col items-center justify-center text-center">
+              <h3 className="text-sm font-black text-foreground uppercase tracking-wider mb-4">Total CAT Score</h3>
+              <div className="text-7xl font-black text-foreground tracking-tighter mb-4">
+                {totalCatScore}<span className="text-3xl text-muted-foreground/60 font-semibold tracking-normal">/40</span>
               </div>
               <p className={`text-base font-bold px-4 py-1.5 rounded-full ${catIndicator.className}`}>
                 {catIndicator.text}
@@ -201,19 +201,19 @@ export function ClinicianPage() {
         {/* SECTION 2: Vocal Biomarker Analysis */}
         <section>
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-slate-900">
+            <h2 className="text-2xl font-black text-foreground">
               2. Vocal Biomarker Analysis
             </h2>
-            <p className="text-base text-slate-600 font-medium ml-0">AI-driven acoustic feature extraction from the patient's voice sample.</p>
+            <p className="text-base text-muted-foreground font-medium ml-0">AI-driven acoustic feature extraction from the patient's voice sample.</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 ml-10 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-32 bg-blue-50/50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+          <div className="bg-white rounded-2xl shadow-sm border border-muted p-8 ml-10 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-32 bg-primary/5/50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
             {!voiceResult ? (
-              <div className="flex flex-col items-center justify-center relative z-10 opacity-80 border-2 border-dashed border-slate-300 rounded-xl p-10 bg-slate-50">
-                <Mic className="w-16 h-16 text-slate-400 mb-4" />
-                <p className="text-slate-600 text-center text-lg font-bold">
+              <div className="flex flex-col items-center justify-center relative z-10 opacity-80 border-2 border-dashed border-muted rounded-xl p-10 bg-muted/30">
+                <Mic className="w-16 h-16 text-muted-foreground/60 mb-4" />
+                <p className="text-muted-foreground text-center text-lg font-bold">
                   Patient opted out of providing a voice sample for this assessment.
                 </p>
               </div>
@@ -223,33 +223,33 @@ export function ClinicianPage() {
                 <div className="lg:col-span-4 flex flex-col gap-6">
                   {/* Scores side-by-side on desktop */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
-                      <div className="text-slate-900 text-xs font-black mb-1 uppercase tracking-wider">Certainty Score</div>
-                      <div className="text-4xl font-black text-blue-700">{certaintyScore}%</div>
-                      <div className="text-sm text-slate-500 mt-1 font-semibold">AI Confidence</div>
+                    <div className="bg-muted/30 p-5 rounded-xl border border-muted shadow-sm flex flex-col justify-center">
+                      <div className="text-foreground text-xs font-black mb-1 uppercase tracking-wider">Certainty Score</div>
+                      <div className="text-4xl font-black text-primary">{certaintyScore}%</div>
+                      <div className="text-sm text-muted-foreground mt-1 font-semibold">AI Confidence</div>
                     </div>
                     <div className={aiContainerClass}>
-                      <div className="text-slate-900 text-xs font-black mb-1 uppercase tracking-wider">Acoustic Risk</div>
+                      <div className="text-foreground text-xs font-black mb-1 uppercase tracking-wider">Acoustic Risk</div>
                       <div className={aiNumberClass}>{voiceResult?.risk_score || 0}/100</div>
-                      <div className={`text-sm mt-1 font-bold ${aiRisk === null ? 'text-slate-600' : (aiRisk >= 90 ? 'text-red-600' : aiRisk > 80 ? 'text-amber-600' : 'text-slate-600')}`}>Anomaly detected</div>
+                      <div className={`text-sm mt-1 font-bold ${aiRisk === null ? 'text-muted-foreground' : (aiRisk >= 90 ? 'text-red-600' : aiRisk > 80 ? 'text-amber-600' : 'text-muted-foreground')}`}>Anomaly detected</div>
                     </div>
                   </div>
 
                   {/* Details block */}
-                  <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-                      <span className="text-sm font-semibold text-slate-600">Max Phonation Time</span>
-                      <span className="text-base font-black text-slate-900">{voiceResult?.mpt ? `${voiceResult.mpt}s` : 'N/A'}</span>
+                  <div className="bg-white p-5 rounded-xl border border-muted shadow-sm space-y-4">
+                    <div className="flex justify-between items-center pb-3 border-b border-muted/50">
+                      <span className="text-sm font-semibold text-muted-foreground">Max Phonation Time</span>
+                      <span className="text-base font-black text-foreground">{voiceResult?.mpt ? `${voiceResult.mpt}s` : 'N/A'}</span>
                     </div>
-                    <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-                      <span className="text-sm font-semibold text-slate-600">Jitter</span>
-                      <span className={`text-xs font-black px-2 py-1 rounded-md uppercase ${voiceResult?.jitter_status?.includes('Elevated') ? 'bg-red-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+                    <div className="flex justify-between items-center pb-3 border-b border-muted/50">
+                      <span className="text-sm font-semibold text-muted-foreground">Jitter</span>
+                      <span className={`text-xs font-black px-2 py-1 rounded-md uppercase ${voiceResult?.jitter_status?.includes('Elevated') ? 'bg-red-600 text-white shadow-sm' : 'bg-slate-100 text-muted-foreground border border-muted'}`}>
                         {voiceResult?.jitter_status || 'Unknown'}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-semibold text-slate-600">Shimmer</span>
-                      <span className={`text-xs font-black px-2 py-1 rounded-md uppercase ${voiceResult?.shimmer_status?.includes('Elevated') ? 'bg-red-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+                      <span className="text-sm font-semibold text-muted-foreground">Shimmer</span>
+                      <span className={`text-xs font-black px-2 py-1 rounded-md uppercase ${voiceResult?.shimmer_status?.includes('Elevated') ? 'bg-red-600 text-white shadow-sm' : 'bg-slate-100 text-muted-foreground border border-muted'}`}>
                         {voiceResult?.shimmer_status || 'Unknown'}
                       </span>
                     </div>
@@ -259,7 +259,7 @@ export function ClinicianPage() {
                 {/* Right Column: Spectrogram (Much Larger) */}
                 <div className="lg:col-span-8 flex flex-col h-full">
                   {voiceResult?.spectrogram_base64 ? (
-                    <div className="w-full h-full min-h-[400px] bg-white rounded-xl border border-slate-300 shadow-sm p-2 flex items-center justify-center">
+                    <div className="w-full h-full min-h-[400px] bg-white rounded-xl border border-muted shadow-sm p-2 flex items-center justify-center">
                       <img
                         src={`data:image/png;base64,${voiceResult.spectrogram_base64}`}
                         alt="Voice Spectrogram"
@@ -267,7 +267,7 @@ export function ClinicianPage() {
                       />
                     </div>
                   ) : showMockData ? (
-                    <div className="w-full h-full min-h-[400px] bg-white rounded-xl border border-slate-300 shadow-sm p-2 flex items-center justify-center">
+                    <div className="w-full h-full min-h-[400px] bg-white rounded-xl border border-muted shadow-sm p-2 flex items-center justify-center">
                       <img
                         src={exampleMel}
                         alt="Mock Mel Spectrogram"
@@ -275,16 +275,16 @@ export function ClinicianPage() {
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-full min-h-[400px] border-2 border-slate-200 border-dashed rounded-xl flex items-center justify-center text-slate-400 text-base font-semibold bg-slate-50">
+                    <div className="w-full h-full min-h-[400px] border-2 border-muted border-dashed rounded-xl flex items-center justify-center text-muted-foreground/60 text-base font-semibold bg-muted/30">
                       Spectrogram data not available
                     </div>
                   )}
                 </div>
 
                 {/* AI Model Description */}
-                <div className="lg:col-span-12 mt-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex items-start gap-4">
-                  <BrainCircuit className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-blue-900 font-medium leading-relaxed">
+                <div className="lg:col-span-12 mt-2 bg-primary/5/50 p-4 rounded-xl border border-primary/10 flex items-start gap-4">
+                  <BrainCircuit className="w-6 h-6 text-primary shrink-0 mt-0.5" />
+                  <p className="text-sm text-foreground font-medium leading-relaxed">
                     <strong>Vocal Analysis Model:</strong> This acoustic biomarker evaluation utilizes a specialized neural network trained on clinical respiratory voice samples. It analyzes micro-variations in vocal cord vibration (jitter/shimmer) and pulmonary capacity (MPT) to identify patterns strongly correlated with chronic obstructive pulmonary disease (COPD) and other restrictive airway conditions.
                   </p>
                 </div>
@@ -296,40 +296,40 @@ export function ClinicianPage() {
         {/* SECTION 3: Comprehensive Overview */}
         <section className="pt-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-slate-900">
+            <h2 className="text-2xl font-black text-foreground">
               3. Final Evaluation & Recommendations
             </h2>
-            <p className="text-base text-slate-600 font-medium ml-0">Holistic overview combining patient reports and acoustic biomarkers.</p>
+            <p className="text-base text-muted-foreground font-medium ml-0">Holistic overview combining patient reports and acoustic biomarkers.</p>
           </div>
 
           <div className="ml-10">
             {/* The 3 specific risk boxes */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div className="p-5 bg-muted/30 rounded-2xl border border-muted shadow-sm flex flex-col justify-between">
                 <div>
-                  <div className="text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Clinical Form Risk</div>
-                  <div className="text-2xl font-black text-slate-900">{clinicalResult?.risk_level || "Unknown"}</div>
+                  <div className="text-xs font-black text-foreground uppercase tracking-wider mb-2">Clinical Form Risk</div>
+                  <div className="text-2xl font-black text-foreground">{clinicalResult?.risk_level || "Unknown"}</div>
                 </div>
-                <div className="text-base text-slate-600 mt-4 font-semibold">
+                <div className="text-base text-muted-foreground mt-4 font-semibold">
                   GOLD Group {clinicalResult?.risk_group || "?"}
                 </div>
               </div>
 
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div className="p-5 bg-muted/30 rounded-2xl border border-muted shadow-sm flex flex-col justify-between">
                 <div>
-                  <div className="text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Acoustic Biomarker Risk</div>
-                  <div className="text-2xl font-black text-slate-900">
+                  <div className="text-xs font-black text-foreground uppercase tracking-wider mb-2">Acoustic Biomarker Risk</div>
+                  <div className="text-2xl font-black text-foreground">
                     {!voiceResult ? "Not Assessed" : (voiceResult.risk_score >= 60 ? "Elevated" : "Low/Normal")}
                   </div>
                 </div>
-                <div className="text-base text-slate-600 mt-4 font-semibold">
+                <div className="text-base text-muted-foreground mt-4 font-semibold">
                   {voiceResult ? "AI Risk Score: " + voiceResult.risk_score + "/100" : "No voice sample"}
                 </div>
               </div>
 
               <div className={`p-5 rounded-2xl border-2 flex flex-col justify-between shadow-sm ${getRiskColor(getCombinedRisk())}`}>
                 <div>
-                  <div className="text-xs font-black uppercase text-slate-900 tracking-wider mb-2">Combined Assessment Risk</div>
+                  <div className="text-xs font-black uppercase text-foreground tracking-wider mb-2">Combined Assessment Risk</div>
                   <div className="text-2xl font-black">{getCombinedRisk()}</div> 
                 </div>
                 {getCombinedRisk().includes('Risk') && (
