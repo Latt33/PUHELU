@@ -325,7 +325,7 @@ function calc(v){
   var undiagPool=baseUndiag;
   var fpUntestedPool=baseNonCOPD;
   var curEng=eng;
-  var prevMultiplier=0; // track expansion to add new pools
+  var prevMultiplier=1.0; // starts at 1× (Helsinki already in base pools)
 
   var years=[],cumDx=0,cumCostPV=0,cumSavingsPV=0;
   for(var y=0;y<5;y++){
@@ -334,15 +334,11 @@ function calc(v){
 
     // When regions expand, add new undiagnosed + non-COPD pools
     if(mult>prevMultiplier+0.01){
-      var addedFraction=(mult-prevMultiplier)/mult; // fraction of current pool that is new
       var newPatientsBase=Math.round(C.uniquePatients*(mult-prevMultiplier));
       undiagPool+=Math.round(newPatientsBase*prev*C.undiagnosedFraction);
       fpUntestedPool+=Math.round(newPatientsBase*(1-prev));
       prevMultiplier=mult;
     }
-
-    // Scale screening probability by current multiplier (more patients = same per-patient rate)
-    var yearScreened=Math.round(C.uniquePatients*mult*annualProb);
 
     // TRUE POSITIVES: fraction of remaining undiagnosed pool gets screened
     var tpScreened=Math.round(undiagPool*annualProb);
@@ -622,7 +618,7 @@ function renderDualPanels(r){
   var countyCumCost=0,countyCumSav=0,countyPayback=null,countyData=[];
   for(var i=0;i<5;i++){
     var y=r.years[i];
-    var yCost=y.opsCost+y.spiroCost+y.gpCost+(currentFunding==='public'?y.devCost:0);
+    var yCost=y.opsCost+y.spiroCost+y.gpCost+(y.expansionCost||0)+(currentFunding==='public'?y.devCost:0);
     countyCumCost+=yCost;countyCumSav+=y.savings;
     var cNet=countyCumSav-countyCumCost;
     countyData.push({cost:yCost,sav:y.savings,cumCost:countyCumCost,cumSav:countyCumSav,cumNet:cNet});
