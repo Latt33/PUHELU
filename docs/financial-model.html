@@ -122,7 +122,7 @@
 <body>
 <div id="tooltip"></div>
 <h1>PUHELU Financial Model</h1>
-<p class="subtitle">Helsinki pilot &middot; COPD screening via primary care SMS &middot; Interactive assumptions</p>
+<p class="subtitle">Helsinki pilot &rarr; national rollout &middot; COPD screening via primary care SMS &middot; 5-year NPV model</p>
 
 <div class="selector-row">
   <div>
@@ -670,6 +670,12 @@ function renderDualPanels(r){
     ['RWE: validated screening cohort for HTA submissions','HEOR data for payer negotiations across EU markets','Market shaping: '+fmt(r.cumDx)+' newly diagnosed = expanded addressable population','Replicable model for 30+ EU markets (all FHIR-capable)','Health system partnership at county level','Unbranded, disease-centric, HCP-initiated (EFPIA/PIF compliant)'
     ].forEach(function(t){var li=document.createElement('li');li.textContent=t;pbul.appendChild(li);});
     pharmaEl.appendChild(pbul);
+
+    // Precedent note
+    var pprec=document.createElement('div');pprec.style.cssText='font-size:11px;color:var(--dim);margin-top:10px;padding:8px 10px;background:var(--section-alt);border-radius:4px;';
+    pprec.textContent='Precedent: Pharma-funded COPD case-finding (GSK Salford Lung Study, CAPTURE tool/JAMA 2023, AI-EHR screening partnerships). FinnGen: \u20AC59M Finnish PPP with 11 pharma partners.';
+    tip(pprec,'pPharmaAlign');
+    pharmaEl.appendChild(pprec);
 
     var prisk=document.createElement('div');prisk.className='side-risk low';
     prisk.textContent='Risk: '+fmtE(pharmaInvest)+' exposure \u2014 small relative to respiratory R&D budgets. Strategic optionality in 30+ EU markets.';
