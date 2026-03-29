@@ -275,9 +275,9 @@ var currentFunding='ppp';
 // ── Funding model: who pays what ──
 function fundingSplit(r){
   // All values from years array are in PV terms. Sum consistently.
-  var devPV=r.years[0].devCost; // already discounted (year 0, disc=1, so same as nominal)
+  var devPV=r.years[0].devCost;
   var opsPV=r.years.reduce(function(s,y){return s+y.opsCost;},0);
-  var spiroPV=r.years.reduce(function(s,y){return s+y.spiroCost+y.gpCost;},0);
+  var spiroPV=r.years.reduce(function(s,y){return s+y.spiroCost+y.gpCost+(y.expansionCost||0);},0);
   var total=r.totalCost,savings=r.totalSavings;
   if(currentFunding==='public')return{
     label:'County Perspective',county_cost:total,county_return:savings,pharma_cost:0,grant:0,
@@ -920,6 +920,40 @@ window.addEventListener('resize',function(){var r=calc(currentValues);renderChar
       <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">18. Visits per year: documented constant, not a slider</h2>
       <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Critique:</strong> The PE review suggested making visits/year a slider since it&rsquo;s the single biggest driver of screening volume.</p>
       <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Decision:</strong> Kept as a documented constant at 3.0. This is a verifiable fact from Eurostat (Finland: 4.4 total consultations/capita/year, 2023) adjusted down for Helsinki + smoking-exposed population characteristics. It should not be an assumption to play with &mdash; it should be measured from Apotti appointment data in the pilot.</p>
+    </div>
+  </div>
+</div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">19. QALY lowered from 0.5 to 0.3 per detected case</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Previous:</strong> 0.5 QALY/detected case, described as &ldquo;optimistic end of literature.&rdquo;</p>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> Lambe et al. (Thorax 2019) reports 0.028 QALY/screened patient. Dividing by 8.8% COPD prevalence gives 0.32/COPD case. But not all gain is incremental &mdash; some cases would have been diagnosed through usual care. 0.5 overstated the incremental benefit.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Lowered to 0.3 QALY/detected case. Conservative relative to the 0.32 derivation, accounting for non-incremental diagnoses. Cost/QALY increases ~67% but remains well below Finnish thresholds.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">20. National expansion built into model</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Previous:</strong> Model only showed Helsinki/Apotti pilot (115,000 eligible patients, 1.7M population). Did not account for national rollout.</p>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> The whole pitch is &ldquo;pilot in Helsinki, then scale nationally.&rdquo; Showing only Helsinki understates the opportunity by ~3.3&times;. All 4 Finnish EHR systems support FHIR R4.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Population multiplier ramps over 5 years: Year 0&ndash;1 Helsinki/Apotti (1&times;), Year 2 +Lifecare (2.2&times;), Year 3+ full national (3.3&times;). Each expansion adds EHR integration costs (&euro;120k Lifecare, &euro;150k OMNI360+Esko). Operations scale sub-linearly (shared infrastructure). New undiagnosed and non-COPD pools are added when regions come online.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">21. Generic pharma partner (was: AstraZeneca-specific)</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Previous:</strong> Model explicitly named AstraZeneca throughout, framing the project around their product portfolio.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Replaced with generic &ldquo;Pharma Partner.&rdquo; The model now shows what any respiratory pharma company gains: real-world evidence, disease awareness, EU replication model, health system partnerships. The 12% weighted market share applies to any single partner with an ICS-focused portfolio. Compliant with EFPIA and Finnish pharmaceutical industry (L&auml;&auml;keteollisuus ry) codes.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">22. Physician engagement simplified</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Previous:</strong> Logarithmic learning curve with PPV-adjusted ceiling. Engagement drifted over time based on flag accuracy.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Reverted to flat rate from slider. The learning curve added complexity with marginal impact and no empirical basis for the specific curve parameters. The pilot&rsquo;s primary purpose is to <em>measure</em> this rate, not predict it from a model. The slider IS the assumption.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">23. All citations verified against primary sources</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> Earlier research agents fabricated several citations (Lokke 2012, Jordan 2014 Thorax, Castillo 2019, TLV Sweden). These papers either don&rsquo;t exist or don&rsquo;t contain the claimed data.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> All tooltips now cite only verified sources: Lambe et al. (Thorax 2019, PMC6703126) for QALY. Anthonisen et al. (AJRCCM 2002) for progression rate. Herse et al. (npj PCRM 2015) and Viinanen et al. (Int J COPD 2019) for Finnish unit costs. Lisspers et al. (Int J COPD 2018, ARCTIC study) for early-dx savings. Restrepo et al. (Int J COPD 2008) for adherence. Eurostat 2023 for visit frequency.</p>
     </div>
   </div>
 </div>
