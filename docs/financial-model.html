@@ -353,11 +353,14 @@ function calc(v){
     var yearSpiroFP=Math.round(yearFP*curEng);
     fpUntestedPool=Math.max(0,fpUntestedPool-yearSpiroFP);
 
-    // PHYSICIAN ENGAGEMENT: flat rate from slider.
-    // Kept simple — the slider IS the assumption. The pilot's primary purpose
-    // is to measure this rate, not predict it from a learning curve model.
+    // PHYSICIAN ENGAGEMENT: slider value is the steady-state rate.
+    // Year 0 ramps to it (doctors don't adopt instantly — early adopters first,
+    // then broader uptake). Represents ~65% of full rate in Year 0, 100% from Year 1.
+    // New expansion regions also start at reduced engagement in their first year.
     var ppv=(yearTP+yearFP)>0?yearTP/(yearTP+yearFP):0;
-    curEng=eng; // flat — no adaptation modelled
+    var adoptionRamp=y===0?0.65:1.0; // Year 0 reduced adoption
+    if(C.expansionMultiplier[y]>C.expansionMultiplier[Math.max(0,y-1)]+0.01)adoptionRamp=0.75; // expansion year
+    curEng=eng*adoptionRamp;
 
     cumDx+=yearDx;
     var treated=cumDx-yearDx*0.5;
@@ -960,6 +963,12 @@ window.addEventListener('resize',function(){var r=calc(currentValues);renderChar
       <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">23. All citations verified against primary sources</h2>
       <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> Earlier research agents fabricated several citations (Lokke 2012, Jordan 2014 Thorax, Castillo 2019, TLV Sweden). These papers either don&rsquo;t exist or don&rsquo;t contain the claimed data.</p>
       <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> All tooltips now cite only verified sources: Lambe et al. (Thorax 2019, PMC6703126) for QALY. Anthonisen et al. (AJRCCM 2002) for progression rate. Herse et al. (npj PCRM 2015) and Viinanen et al. (Int J COPD 2019) for Finnish unit costs. Lisspers et al. (Int J COPD 2018, ARCTIC study) for early-dx savings. Restrepo et al. (Int J COPD 2008) for adherence. Eurostat 2023 for visit frequency.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">24. Physician adoption ramp in Year 0 and expansion years</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Issue:</strong> The model assumed full physician engagement from Day 1. At base case 50% engagement, this generated ~7,000 spirometry referrals (&euro;764k) in Year 1 &mdash; equivalent to ~23 additional tests per health centre per month. While technically absorbable, it ignored that physician adoption takes time: early adopters first, then gradual uptake.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Year 0 engagement is 65% of the slider value (doctors are still learning the system). Expansion years (when new EHR regions come online) use 75% of the slider value. Full engagement rate from Year 1 in established regions. This reduces Year 0 spirometry costs by ~35% and makes the early P&amp;L more realistic.</p>
     </div>
   </div>
 </div>
