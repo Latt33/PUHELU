@@ -253,10 +253,12 @@ var CONSTANTS={
   gpCostPerReferral:21,         // EUR per flag review (~5min of loaded GP time, inflation-adjusted)
   pharmaMarketShare:0.12,        // weighted avg for a single pharma partner: 0% GOLD A, ~5-10% GOLD B, ~35% of 30-40% who escalate
   pharmaRevenuePerPatient:1200,  // avg annual medication revenue per patient on partner's therapy (inflation-adjusted, triple therapy growing)
-  // National expansion: population multiplier per year + integration costs
-  // Year 0-1: Helsinki/Apotti (1.7M, 1×), Year 2: +Lifecare (2.0M, 2.2×), Year 3+: +OMNI360+Esko (1.9M, 3.3×)
-  expansionMultiplier:[1.0, 1.0, 2.2, 3.3, 3.3],
-  expansionIntegrationCost:[0, 0, 120000, 150000, 0] // EUR: Lifecare in Y2, OMNI360+Esko in Y3
+  // National expansion: gradual ramp, not step changes.
+  // Regions don't go from zero to full capacity in one year — phased rollout across health centres.
+  // Y0: Helsinki only (1×). Y1: Helsinki full + Lifecare starts (1.4×). Y2: Lifecare full + others start (2.2×).
+  // Y3: most regions live (2.8×). Y4: full national (3.3×).
+  expansionMultiplier:[1.0, 1.4, 2.2, 2.8, 3.3],
+  expansionIntegrationCost:[0, 60000, 90000, 90000, 30000] // EUR: phased across Y1-Y4
 };
 var SLIDERS=[
   {id:'clickThrough',label:'Form click-through rate',min:5,max:65,step:1,unit:'%'},
@@ -578,7 +580,7 @@ function renderCashflow(r){
 
   // Expansion phase row
   var eTr=document.createElement('tr');var eL=document.createElement('td');eL.textContent='Coverage';eL.style.color='var(--muted)';eL.style.fontFamily='var(--font-heading)';eL.style.fontSize='12px';eTr.appendChild(eL);
-  var phases=['Helsinki','Helsinki','+Lifecare','National','National'];
+  var phases=['Helsinki','Helsinki+LC start','+LC full+others','Most regions','National'];
   r.years.forEach(function(y,i){var td=document.createElement('td');td.className='num';td.style.color='var(--muted)';td.style.fontSize='10px';td.textContent=phases[i]+(y.multiplier>1?' ('+y.multiplier.toFixed(1)+'\u00D7)':'');eTr.appendChild(td);});
   eTr.appendChild(document.createElement('td'));el.appendChild(eTr);}
 
