@@ -37,8 +37,8 @@ if settings.CORS_ORIGINS:
 # Install logging middleware early so all requests are captured
 app.add_middleware(RequestLoggingMiddleware)
 
-# Register API routes
-app.include_router(api_router)
+# Register API routes under configured prefix (defaults set in config)
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def read_root():

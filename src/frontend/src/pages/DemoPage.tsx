@@ -455,7 +455,7 @@ export function DemoPage() {
                   <strong>Voice recording guidance:</strong>
                 </p>
                 <p className="text-blue-800">
-                  Please produce a long, steady vowel sound (for example, "ahhh") while keeping your mouth about a palm's length away from the microphone.
+                  Please produce a long, steady vowel sound (for example, "aaaaa") while keeping your mouth about a palm's length away from the microphone.
                 </p>
               </div>
               

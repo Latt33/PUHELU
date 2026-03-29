@@ -18,3 +18,13 @@ class RiskAnalysisResponse(BaseModel):
     risk_group: str
     risk_level: str
     recommended_action: str
+
+
+class VoiceAnalysisResponse(BaseModel):
+    risk_score: int = Field(..., description="Deterministic risk score (0-100) computed from acoustic metrics")
+    mpt: float = Field(..., description="Max phonation time in seconds")
+    spectrogram_base64: str = Field(..., description="PNG spectrogram image encoded as base64 string")
+    jitter_status: str = Field(..., description="Jitter status label: Normal/Elevated")
+    shimmer_status: str = Field(..., description="Shimmer status label: Normal/Elevated")
+    jitter_percent: float = Field(..., description="Computed jitter percentage")
+    shimmer_percent: float = Field(..., description="Computed shimmer percentage")
