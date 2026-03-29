@@ -5,6 +5,7 @@ import {
   INVESTMENT, FUNNEL, RETURNS, EPI, CITATIONS, eurFmt,
 } from '../data/model';
 
+
 function Cite({ src }: { src: { label: string; url: string } }) {
   return (
     <a
@@ -114,7 +115,7 @@ export function LandingPage() {
           </div>
 
           <p className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-5 leading-relaxed mb-6">
-            No new hardware. No software to install. No physician training. No extra appointments. The screening happens before the patient walks in — at zero cost per person screened.
+            Nothing to buy, nothing to learn, nothing to change. Doctors keep doing what they already do — they just see a flag when a patient needs a closer look. The screening happens before anyone walks through the door.
           </p>
 
           <Link
@@ -139,57 +140,156 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Timeline & Outlook */}
+      {/* Roadmap */}
       <section className="py-20 px-6 md:px-8">
         <div className="mx-auto max-w-5xl">
-          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">
-            Outlook
-          </p>
-          <h2 className="text-2xl md:text-3xl tracking-tight font-bold mb-4 max-w-[540px]">
-            One-year timeline: from pilot to national scale
-          </h2>
-          <p className="text-muted-foreground mb-10 max-w-[540px] leading-relaxed">
-            A single EHR integration in Helsinki, validated over 12 months, creates the pattern for all 21 wellbeing services counties.
-            National rollout adds {eurFmt(INVESTMENT.nationalRollout.low)}–{eurFmt(INVESTMENT.nationalRollout.high)} for 3 additional EHR platforms.
-          </p>
+          <h2 className="text-3xl md:text-4xl tracking-tight font-bold mb-8">Roadmap</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Subtitle bar */}
+          <div className="bg-foreground/5 border border-muted rounded-lg px-5 py-3 mb-4">
+            <p className="text-sm font-medium text-center">The path to an increase diagnosis of COPD in Finland</p>
+          </div>
+
+          {/* Chevron phase bar */}
+          <div className="grid grid-cols-4 mb-1 overflow-hidden rounded-lg">
             {[
-              {
-                quarter: 'Q1',
-                title: 'Integration & validation',
-                items: ['Apotti FHIR R4 integration', 'Clinical validation study', 'Ethics & privacy review (DPIA)'],
-              },
-              {
-                quarter: 'Q2',
-                title: 'Helsinki pilot launch',
-                items: ['Deploy to 2–3 pilot clinics', 'Monitor completion & click-through rates', 'Physician feedback loop'],
-              },
-              {
-                quarter: 'Q3',
-                title: 'Optimise & measure',
-                items: ['A/B test SMS wording & form UX', 'Track spirometry referral rates', 'Interim cost-effectiveness report'],
-              },
-              {
-                quarter: 'Q4',
-                title: 'Scale preparation',
-                items: ['Publish pilot results', 'Lifecare / OMNI360 integration spec', 'National rollout proposal'],
-              },
-            ].map((phase) => (
-              <div key={phase.quarter} className="rounded-xl border border-muted bg-white p-5">
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm mb-3">
-                  {phase.quarter}
-                </div>
-                <h3 className="font-bold mb-3 text-sm">{phase.title}</h3>
-                <ul className="space-y-1.5">
-                  {phase.items.map((item) => (
-                    <li key={item} className="text-xs text-muted-foreground flex items-start gap-2">
-                      <span className="select-none">–</span>{item}
-                    </li>
-                  ))}
-                </ul>
+              { label: 'Pilot Study', last: false },
+              { label: 'Technology and geography scaling', last: false },
+              { label: 'PUHELU as a Self-Assessment Tool', last: false },
+              { label: 'Outlook', last: true },
+            ].map((phase, i) => (
+              <div
+                key={phase.label}
+                className="relative bg-[#1a6b7a] text-white text-xs font-bold px-3 py-2.5 text-center flex items-center justify-center min-h-[44px]"
+                style={phase.last ? { background: '#1a6b7a', opacity: 0.75 } : undefined}
+              >
+                <span className="relative z-10 leading-tight">{phase.label}</span>
+                {!phase.last && (
+                  <div className="absolute right-0 top-0 bottom-0 w-4 z-20 flex items-center">
+                    <svg viewBox="0 0 16 44" className="h-full w-4" preserveAspectRatio="none">
+                      <polygon points="0,0 16,22 0,44" fill="var(--background)" />
+                    </svg>
+                  </div>
+                )}
+                {i > 0 && (
+                  <div className="absolute left-0 top-0 bottom-0 w-4 z-20 flex items-center">
+                    <svg viewBox="0 0 16 44" className="h-full w-4" preserveAspectRatio="none">
+                      <polygon points="0,0 16,22 0,44" fill="#1a6b7a" />
+                    </svg>
+                  </div>
+                )}
               </div>
             ))}
+          </div>
+
+          {/* Year labels */}
+          <div className="grid grid-cols-4 gap-0 mb-6">
+            <div className="border border-muted rounded-sm px-3 py-1.5 mr-1">
+              <span className="text-xs font-medium">Year 2027</span>
+            </div>
+            <div className="border border-muted rounded-sm px-3 py-1.5 mx-0.5">
+              <span className="text-xs font-medium">Year 2028</span>
+            </div>
+            <div className="border border-muted rounded-sm px-3 py-1.5 mx-0.5">
+              <span className="text-xs font-medium">Year 2029</span>
+            </div>
+            <div className="border border-dashed border-muted-foreground/40 rounded-sm px-3 py-1.5 ml-1">
+              <span className="text-xs font-medium">Year 2030–2035</span>
+            </div>
+          </div>
+
+          {/* Phase content */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
+
+            {/* Year 2027 — Pilot Study */}
+            <div className="text-sm">
+              <p className="font-bold mb-3">Goal: PUHELU Proof-of-Value</p>
+
+              <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2">Pre-Study</p>
+              <ul className="space-y-1 mb-4 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Stakeholder inclusion</li>
+                <li className="flex items-start gap-1.5 pl-3"><span>›</span>FILHA pulmonologist</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Communication of goals and scope of project</li>
+              </ul>
+
+              <ul className="space-y-1 mb-4 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Study conceptualization</li>
+                <li className="flex items-start gap-1.5 pl-3">1. Electronic form</li>
+                <li className="flex items-start gap-1.5 pl-6">› CAT questionnaire</li>
+                <li className="flex items-start gap-1.5 pl-6">› Vocalization</li>
+                <li className="flex items-start gap-1.5 pl-3">2. Data model for voice analysis</li>
+                <li className="flex items-start gap-1.5 pl-3">3. Indication of treatment</li>
+              </ul>
+
+              <ul className="space-y-1 mb-4 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Ethics board review &amp; approval</li>
+              </ul>
+
+              <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2">Pilot Kick-Off</p>
+              <ul className="space-y-1 mb-4 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Study rollout in pilot hospital</li>
+                <li className="flex items-start gap-1.5 pl-3">› Implementation of electronic form in the booking confirmation</li>
+                <li className="flex items-start gap-1.5 pl-3">› Deployment</li>
+              </ul>
+
+              <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2">Impact evaluation of pilot study on COPD</p>
+              <ul className="space-y-1 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Evaluate increase in diagnosis</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Assess impact on healthcare costs, ROI</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Projection on national expansion</li>
+              </ul>
+            </div>
+
+            {/* Year 2028 — Technology and geography scaling */}
+            <div className="text-sm">
+              <p className="font-bold mb-3">Goal: improve assessment accuracy to increase COPD diagnosis</p>
+
+              <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2">Data source expansion</p>
+              <ul className="space-y-1 mb-4 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Personal Kanta data inclusion to improve prediction model</li>
+                <li className="flex items-start gap-1.5 pl-3">› Identify metrics like medical history, treatment &amp; medication</li>
+                <li className="flex items-start gap-1.5 pl-3">› Map data stream, APIs and intersections</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Technical implementation</li>
+                <li className="flex items-start gap-1.5 pl-3">› Kanta gateway</li>
+                <li className="flex items-start gap-1.5 pl-3">› Model training</li>
+                <li className="flex items-start gap-1.5 pl-3">› Model evaluation</li>
+                <li className="flex items-start gap-1.5 pl-3">› Deployment</li>
+              </ul>
+
+              <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2">National rollout of electronic form</p>
+              <ul className="space-y-1 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Expansion strategy on Finnish population</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Rollout per region</li>
+              </ul>
+            </div>
+
+            {/* Year 2029 — Self-Assessment Tool */}
+            <div className="text-sm">
+              <p className="font-bold mb-3">Goal: target population that doesn't book doctor consultations</p>
+
+              <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2">Patient-centric tool</p>
+              <ul className="space-y-1 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Provide tool as self-assessment questionnaire for population with suspect of COPD</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Recommendation without diagnosis</li>
+              </ul>
+            </div>
+
+            {/* Year 2030–2035 — Outlook */}
+            <div className="text-sm">
+              <p className="font-bold mb-3">
+                Goal: use health data, incl. assessment questionnaires, to predict other diseases like neurological pathologies. By supporting doctors with excessive data handling in the first consultation, we aim to facilitate diagnosis and improve treatment outcomes
+              </p>
+
+              <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2">Expansion onto other diseases</p>
+              <ul className="space-y-1 text-muted-foreground text-xs">
+                <li className="flex items-start gap-1.5"><span>›</span>Identify disease-specific questionnaires</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Identify risk-factors variables</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Train data analysis model</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Assess performance</li>
+                <li className="flex items-start gap-1.5"><span>›</span>Rollout</li>
+              </ul>
+            </div>
+
           </div>
         </div>
       </section>
