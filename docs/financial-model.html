@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PUHELU Financial Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf9f5; --surface: #ffffff; --border: #e0ddd4; --border-strong: #d0cdc4;
+    --text: #141413; --dim: #7a7668; --muted: #9e9a8f;
+    --orange: #d97757; --orange-light: #f4e8e2;
+    --blue: #6a9bcc; --blue-light: #e4eef6;
+    --green: #788c5d; --green-light: #e8eddf;
+    --red: #c45a4a; --red-light: #f5e3e0;
+    --yellow: #b89a3e; --yellow-light: #f3efd8;
+    --section-alt: #f5f3ed; --radius: 8px;
+    --font-display: 'Fraunces', Georgia, ui-serif, serif;
+    --font-heading: 'Poppins', Arial, ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Lora', Georgia, ui-serif, serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-body); font-size: 14px; background: var(--bg); color: var(--text); padding: 32px 40px; line-height: 1.6; }
+  h1 { font-family: var(--font-display); font-size: 28px; font-weight: 550; letter-spacing: -0.035em; line-height: 1.15; margin-bottom: 4px; }
+  h2 { font-family: var(--font-heading); font-size: 13px; font-weight: 600; color: var(--orange); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .subtitle { font-family: var(--font-heading); color: var(--dim); font-size: 13px; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 24px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .slider-group { margin-bottom: 16px; }
+  .slider-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-family: var(--font-heading); }
+  .slider-label span:first-child { color: var(--dim); font-size: 12px; font-weight: 500; }
+  .slider-val { color: var(--orange); font-weight: 600; font-size: 14px; }
+  input[type=range] { width: 100%; height: 5px; -webkit-appearance: none; background: var(--border); border-radius: 3px; outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--orange); cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .kpi-value { font-family: var(--font-heading); font-size: 24px; font-weight: 700; margin-bottom: 2px; letter-spacing: -0.02em; }
+  .kpi-label { font-family: var(--font-heading); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+  .kpi.green { border-color: var(--green); background: var(--green-light); } .kpi.green .kpi-value { color: var(--green); }
+  .kpi.red { border-color: var(--red); background: var(--red-light); } .kpi.red .kpi-value { color: var(--red); }
+  .kpi.yellow { border-color: var(--yellow); background: var(--yellow-light); } .kpi.yellow .kpi-value { color: var(--yellow); }
+  .kpi.blue { border-color: var(--blue); background: var(--blue-light); } .kpi.blue .kpi-value { color: var(--blue); }
+  .kpi.orange { border-color: var(--orange); background: var(--orange-light); } .kpi.orange .kpi-value { color: var(--orange); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { font-family: var(--font-heading); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border-strong); color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-heading); font-size: 12px; }
+  tr.total td { border-top: 2px solid var(--border-strong); font-weight: 700; }
+  .funnel-step { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .funnel-step .label { color: var(--dim); } .funnel-step .val { font-family: var(--font-heading); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .selector-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .selector-row .sel-group { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .sel-btn {
+    font-family: var(--font-heading); font-size: 12px; font-weight: 500;
+    padding: 8px 16px; cursor: pointer; border: none; background: var(--surface);
+    color: var(--dim); transition: all 0.15s; border-right: 1px solid var(--border);
+  }
+  .sel-btn:last-child { border-right: none; }
+  .sel-btn:hover { background: var(--section-alt); }
+  .sel-btn.active { background: var(--orange); color: white; font-weight: 600; }
+  .sel-label { font-family: var(--font-heading); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-bottom: 5px; }
+  canvas { width: 100%; height: 220px; display: block; margin-top: 10px; }
+  .section-label { font-family: var(--font-heading); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; font-weight: 600; }
+  .risk-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .risk-bar .bar { height: 7px; border-radius: 4px; transition: width 0.3s; }
+  .risk-bar .name { font-family: var(--font-heading); font-size: 11px; color: var(--dim); width: 160px; flex-shrink: 0; font-weight: 500; }
+  .risk-bar .impact { font-family: var(--font-heading); font-size: 11px; font-weight: 600; width: 70px; text-align: right; font-variant-numeric: tabular-nums; }
+  .perspectives { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .persp { background: var(--section-alt); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; transition: border-color 0.15s; }
+  .persp.highlighted { border-color: var(--orange); box-shadow: 0 0 0 1px var(--orange); }
+  .persp h3 { font-family: var(--font-heading); font-size: 13px; margin-bottom: 10px; color: var(--orange); font-weight: 600; letter-spacing: -0.01em; }
+  .persp .line { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; }
+  .persp .line .k { color: var(--dim); } .persp .line .v { font-family: var(--font-heading); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tag { font-family: var(--font-heading); font-size: 9px; padding: 1px 6px; border-radius: 3px; font-weight: 600; letter-spacing: 0.03em; margin-left: 6px; vertical-align: middle; }
+  .tag-county { background: var(--blue-light); color: var(--blue); }
+  .tag-pharma { background: var(--orange-light); color: var(--orange); }
+  .tag-grant { background: var(--green-light); color: var(--green); }
+  .has-tip { cursor: help; border-bottom: 1px dotted var(--muted); }
+  #tooltip {
+    display: none; position: fixed; z-index: 999; max-width: 320px; padding: 12px 14px;
+    background: var(--text); color: #faf9f5; border-radius: 6px;
+    font-family: var(--font-body); font-size: 12px; line-height: 1.55;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2); pointer-events: none;
+  }
+  #tooltip .tip-title { font-family: var(--font-heading); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--orange); margin-bottom: 4px; }
+  #tooltip .tip-calc { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.15); font-family: var(--font-heading); font-size: 11px; color: rgba(250,249,245,0.7); }
+
+  /* Dual-panel executive summary */
+  .exec-grid { display: grid; grid-template-columns: 280px 1fr; gap: 24px; margin-bottom: 24px; }
+  .dual-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .dual-panels.single { grid-template-columns: 1fr; max-width: 560px; }
+  .side-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .side-panel.pharma { border-top: 3px solid var(--orange); }
+  .side-panel.county { border-top: 3px solid var(--blue); }
+  .side-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .side-header h3 { font-family: var(--font-heading); font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .side-invest { font-family: var(--font-heading); margin-bottom: 12px; }
+  .side-invest .amount { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+  .side-invest .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .side-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+  .side-metric { padding: 8px 10px; background: var(--section-alt); border-radius: 6px; }
+  .side-metric .mv { font-family: var(--font-heading); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+  .side-metric .ml { font-family: var(--font-heading); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .side-bullets { list-style: none; padding: 0; margin: 12px 0 0; }
+  .side-bullets li { font-size: 12px; color: var(--dim); padding: 3px 0; padding-left: 14px; position: relative; }
+  .side-bullets li::before { content: ''; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 50%; }
+  .side-panel.pharma .side-bullets li::before { background: var(--orange); }
+  .side-panel.county .side-bullets li::before { background: var(--blue); }
+  .side-risk { margin-top: 12px; padding: 10px 12px; border-radius: 6px; font-size: 12px; }
+  .side-risk.low { background: var(--green-light); color: var(--green); }
+  .side-risk.med { background: var(--yellow-light); color: var(--yellow); }
+  .side-risk.high { background: var(--red-light); color: var(--red); }
+  .side-risk strong { font-family: var(--font-heading); font-weight: 600; }
+  canvas.mini { width: 100%; height: 140px; display: block; }
+  .alignment-bar { background: var(--section-alt); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 20px; margin-bottom: 24px; font-size: 13px; color: var(--dim); text-align: center; }
+  .alignment-bar strong { color: var(--text); font-weight: 600; }
+  .view-hidden { display: none; }
+  .detail-content { padding: 0; }
+</style>
+</head>
+<body>
+<div id="tooltip"></div>
+<h1>PUHELU Financial Model</h1>
+<p class="subtitle">Helsinki pilot &middot; COPD screening via primary care SMS &middot; Interactive assumptions</p>
+
+<div class="selector-row">
+  <div>
+    <div class="sel-label">View</div>
+    <div class="sel-group" id="view-btns">
+      <button class="sel-btn active" data-v="summary" onclick="setView('summary')">Summary</button>
+      <button class="sel-btn" data-v="model" onclick="setView('model')">Full Model</button>
+    </div>
+  </div>
+  <div>
+    <div class="sel-label">Funding Model</div>
+    <div class="sel-group" id="funding-btns">
+      <button class="sel-btn" data-f="public" onclick="setFunding('public')">Public Funded</button>
+      <button class="sel-btn active" data-f="ppp" onclick="setFunding('ppp')">Partnership (PPP)</button>
+    </div>
+  </div>
+  <div>
+    <div class="sel-label">Scenario</div>
+    <div class="sel-group" id="scenario-btns">
+      <button class="sel-btn" data-s="pessimistic" onclick="loadScenario('pessimistic')">Pessimistic</button>
+      <button class="sel-btn active" data-s="base" onclick="loadScenario('base')">Base Case</button>
+      <button class="sel-btn" data-s="optimistic" onclick="loadScenario('optimistic')">Optimistic</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sliders always visible -->
+<div style="display:grid;grid-template-columns:280px 1fr;gap:24px;">
+  <div class="panel" style="position:sticky;top:16px;align-self:start;"><h2>Assumptions</h2><div id="sliders"></div></div>
+  <div>
+    <!-- SUMMARY VIEW -->
+    <div id="summary-view">
+      <div class="dual-panels" id="dual-panels">
+        <div class="side-panel pharma" id="sp-pharma"></div>
+        <div class="side-panel county" id="sp-county"></div>
+      </div>
+      <div class="alignment-bar" id="alignment-bar"></div>
+      <div class="kpi-row" id="kpis"></div>
+    </div>
+    <!-- FULL MODEL VIEW -->
+    <div id="full-model" class="view-hidden">
+      <div class="panel"><h2>Screening Funnel</h2><div id="funnel"></div></div>
+      <div class="panel">
+        <div class="section-label">5-Year Cash Flow (NPV) &mdash; <span id="cf-perspective"></span></div>
+        <table id="cashflow"></table>
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="panel">
+        <div class="section-label">Sensitivity &mdash; NPV Impact of &plusmn;50% Change</div>
+        <div id="sensitivity"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- placeholder: full model content is now inline above -->
+
+<script>
+// ── Tooltips ──
+var TIPS = {
+  clickThrough:['Form click-through rate','Percentage of patients who receive the SMS and click the link to open the screening form. Health SMS click-through benchmarks range 15\u201355% depending on wording and patient demographics.','Opened \u00F7 SMS delivered'],
+  completion:['Form completion rate','Of patients who opened the form, how many finish all questions including the vocalization task. One-question-at-a-time design and <3 min length help maximize this.','Completed \u00F7 Opened'],
+  prevalence:['COPD prevalence in pool','Estimated COPD rate among the screened population. Higher than the 6% general population rate because this pool is pre-selected by smoking history. Literature supports 15\u201325% for smoking-exposed primary care visitors.','Based on Kotaniemi et al. 2005'],
+  sensitivity:['Screening sensitivity','True positive rate: what percentage of actual COPD cases the screening correctly flags. Higher sensitivity catches more cases but may increase false positives. CAT questionnaire alone: ~60\u201370%. Vocal biomarker adds supplementary signal.','True positives \u00F7 All actual COPD cases'],
+  specificity:['Screening specificity','True negative rate: what percentage of non-COPD patients the screening correctly clears. Lower specificity means more false alarms \u2192 wasted spirometry \u2192 potential physician distrust.','1 \u2212 (False positives \u00F7 All non-COPD patients)'],
+  physicianEngagement:['Physician engagement','Of all flagged patients, what percentage actually get a spirometry referral from the doctor. This is the single most uncertain and highest-impact variable. Alert fatigue, trust in the system, and flag placement in the EHR all affect this.','Spirometry ordered \u00F7 Flags shown to doctor'],
+  devCost:['Development cost','One-time investment: platform build (form engine, scoring, voice ML), Apotti FHIR R4 integration, clinical validation. Does NOT include full MDR Class IIa certification \u2014 if PUHELU is classified as a medical device, add \u20AC80\u2013200k and 6\u201318 months.','Software: ~\u20AC80\u2013100k. Integration: ~\u20AC35\u201360k. Validation: ~\u20AC40\u201370k.'],
+  opsCost:['Annual operations','Yearly cost: full-stack developer (~\u20AC55\u201370k loaded), part-time PM/clinical liaison (~\u20AC30\u201340k), hosting/infra (~\u20AC15\u201320k), data analysis (~\u20AC15\u201325k). \u20AC140k is a realistic baseline for a staffed operation.','Dev + PM + infra + analysis'],
+  eligible:['Eligible patients','Unique smoking-exposed patients visiting Helsinki primary care annually. THL data: general pop 2.5\u20133.5 visits/yr, smokers ~1.5\u20132\u00D7 higher, Helsinki 25\u201330% below national avg.','Fixed at 115,000'],
+  perSmsRate:['Per-SMS completion rate','Probability a patient completes screening on any single appointment SMS. Each visit = one chance. Multiple visits per year compound into higher annual probability.','SMS delivery \u00D7 Click-through \u00D7 Completion'],
+  visitsPerYear:['Visits per patient per year','How often smoking-exposed patients visit primary care. Each visit = one SMS = one screening opportunity. Eurostat 2023: Finland = 4.4 total doctor consultations/capita (primary + specialist). Adjusted down to 3.0 for: Helsinki lower public primary care usage (occupational health absorbs working-age visits) + primary care share only.','Eurostat Healthcare Activities Statistics 2023'],
+  annualProb:['Annual screening probability','Probability a patient completes screening at least once during the year, given multiple visits. Compounds across ~3 opportunities.','1 \u2212 (1 \u2212 per-SMS rate) ^ visits/yr'],
+  screened:['Unique patients screened per year','Patients who complete screening at least once this year. Higher than single-SMS conversion because of ~3 opportunities per year.','Eligible \u00D7 Annual screening probability'],
+  copdInPool:['COPD cases in pool','Estimated patients in the screened pool who actually have COPD, whether diagnosed or not. Applied as a flat prevalence rate.','Screened \u00D7 Prevalence rate'],
+  undiagnosed:['Undiagnosed in pool','49% of people with spirometry-confirmed airflow obstruction in Finland had no prior COPD diagnosis.','COPD in pool \u00D7 49% (Kotaniemi et al. 2005)'],
+  truePos:['Correctly flagged','Undiagnosed COPD patients the screening correctly identifies as at-risk.','Undiagnosed \u00D7 Sensitivity'],
+  falsePos:['False positives flagged','Non-COPD patients incorrectly flagged. These generate unnecessary spirometry referrals and can erode physician trust if too high.','(Screened \u2212 COPD cases) \u00D7 (1 \u2212 Specificity)'],
+  spiroTP:['Spirometry referrals (TP)','True positive flags where the physician followed through with a spirometry order.','Correctly flagged \u00D7 Physician engagement'],
+  spiroFP:['Spirometry referrals (FP)','False positive flags where the physician ordered spirometry for a non-COPD patient. Each costs \u20AC110.','False positives \u00D7 Physician engagement'],
+  newDx:['New COPD diagnoses','Confirmed new cases after spirometry.','TP spirometry referrals \u00D7 80% confirmation rate'],
+  kpiDx:['5-Year New Diagnoses','Cumulative previously-undiagnosed COPD patients identified over 5 years. Annual yield declines as the undiagnosed pool gradually depletes and easiest-to-reach patients are screened first.','Sum of annual diagnoses with year-over-year decay'],
+  kpiROI:['5-Year ROI','Returns divided by costs for the selected funding model perspective over 5 years. In pharma-led model, this is medication revenue \u00F7 pharma investment.','Returns \u00F7 Costs (perspective-dependent)'],
+  kpiPayback:['Payback Period','Months until cumulative returns exceed cumulative costs for the selected perspective. Green \u226424mo, yellow \u226448mo, red >48mo.','Month where cumulative net turns positive'],
+  kpiTV:['Terminal Value','Present value of all savings beyond Year 5. Diagnosed patients continue generating healthcare savings for decades. Calculated as a growing perpetuity: Year 5 net savings \u00F7 (discount rate \u2212 1% growth), discounted back to present. Conservative 1% growth rate (below healthcare cost inflation).','Year 5 net savings \u00F7 (3.5% \u2212 1%) \u00D7 PV factor'],
+  kpiQALY:['Cost per QALY','Total system cost \u00F7 QALYs gained. Using 0.3 QALY/detected case (conservative). Source: Lambe et al. (Thorax 2019) reported 0.028 QALY/screened patient; \u00F7 8.8% COPD prevalence = 0.32/COPD case. We use 0.3 to account for cases that would have been diagnosed through usual care anyway. Finnish threshold: ~\u20AC30,000\u201350,000/QALY.','Total costs \u00F7 (Diagnoses \u00D7 0.3 QALY). Lambe et al., Thorax 2019, PMC6703126'],
+  cfDev:['Development','One-time Year 0 cost: platform build, Apotti FHIR R4 integration, clinical validation study. Excludes MDR certification.','Paid once upfront'],
+  cfOps:['Operations','Annual: developer, PM, hosting, monitoring, clinical oversight, reporting.','Paid each year of the pilot'],
+  cfSpiro:['Spirometry (marginal)','Marginal spirometries triggered by PUHELU. Both TP and FP referrals decay: TP shrinks as undiagnosed pool depletes. FP shrinks as non-COPD patients get cleared by negative spirometry (doctors don\u2019t re-refer). Many patients would eventually get spirometry during acute episodes anyway.','(TP + FP referrals) \u00D7 \u20AC110 \u2014 both pools deplete'],
+  cfGP:['GP flag review','Doctor time to review each flag and discuss with patient. ~5 min of loaded GP time per spirometry referral.','Spirometry referrals \u00D7 \u20AC15'],
+  cfAcute:['Acute care avoidance','Avoided hospitalisations + ER visits = \u20AC509/pt/yr at full severity. Derived from: \u20AC590/day secondary care (Herse et al., npj PCRM 2015) + \u20AC195/ER visit (Viinanen et al., Int J COPD 2019). Cross-check: ARCTIC study (Lisspers et al., Int J COPD 2018) found \u20AC1,278/yr savings from early vs late diagnosis \u2014 our figure is conservative. Severity-ramped: 20% Year 0 \u2192 100% Year 4 (GOLD A/B patients have low near-term hosp. risk). Adherence-adjusted (64%) and discounted (3.5%).','Treated \u00D7 \u20AC509 \u00D7 severity ramp \u00D7 64% \u00D7 discount'],
+  cfProgression:['Disease progression avoidance','Avoided medication escalation + COPD outpatient costs. COPD-specific cost delta: \u20AC218/yr non-severe vs severe (Viinanen et al., Int J COPD 2019: \u20AC319 vs \u20AC537). Progression rate 40%: Lung Health Study found 38% of continuing smokers with early COPD progressed to severe within 11yr (Anthonisen et al., AJRCCM 2002). Ramps years 1\u20133. Excludes hospitalisations (separate row). Medication costs paid by Kela (65%, code 203) + patient (35%, cap ~\u20AC627/yr), NOT by county.','Dx \u00D7 \u20AC218 \u00D7 40% \u00D7 ramp \u00D7 64% adherence \u00D7 discount'],
+  pCostQALY:['Cost per QALY','Accepted health-economic comparator. Finnish threshold ~\u20AC30,000\u201350,000/QALY. Most screening programs: \u20AC2,000\u201320,000/QALY.',''],
+  pPharmaAlign:['Pharma value proposition','Beyond direct medication revenue, pharma partners gain: (1) Real-world evidence from a validated screening cohort, (2) Health economics data for reimbursement submissions, (3) Disease awareness positioning in the Finnish market, (4) Replicable pilot model for EU-wide rollout, (5) Academic publication co-authorship, (6) Health system partnership at county level. Revenue model: GOLD A/B patients start on LAMA (Boehringer/GSK dominate). ~30\u201340% escalate to ICS-containing therapy. Weighted single-partner share: ~12%.','Compliant with EFPIA code + Finnish pharma industry guidelines (L\u00E4\u00E4keteollisuus ry)'],
+  pMaxRisk:['Max single-party risk','Under the PPP structure, the largest amount any one party needs to invest.','max(Dev cost, 5 \u00D7 Ops cost)'],
+};
+var tooltipEl=document.getElementById('tooltip');
+function tip(el,key){var t=TIPS[key];if(!t)return el;el.classList.add('has-tip');
+  el.addEventListener('mouseenter',function(e){tooltipEl.textContent='';
+    var title=document.createElement('div');title.className='tip-title';title.textContent=t[0];tooltipEl.appendChild(title);
+    tooltipEl.appendChild(document.createTextNode(t[1]));
+    if(t[2]){var c=document.createElement('div');c.className='tip-calc';c.textContent=t[2];tooltipEl.appendChild(c);}
+    tooltipEl.style.display='block';positionTooltip(e);});
+  el.addEventListener('mousemove',positionTooltip);
+  el.addEventListener('mouseleave',function(){tooltipEl.style.display='none';});return el;}
+function positionTooltip(e){var x=e.clientX+14,y=e.clientY+14;var tw=tooltipEl.offsetWidth,th=tooltipEl.offsetHeight;
+  if(x+tw>window.innerWidth-12)x=e.clientX-tw-10;if(y+th>window.innerHeight-12)y=e.clientY-th-10;
+  tooltipEl.style.left=x+'px';tooltipEl.style.top=y+'px';}
+
+// ── State ──
+var CONSTANTS={
+  uniquePatients:115000,        // unique smoking-exposed patients visiting Helsinki primary care/yr
+  visitsPerYear:3.0,            // primary care visits per patient per year (THL: 2.5-3.5 general, smokers higher, Helsinki lower)
+  smsDelivery:0.92,             // SMS delivery rate
+  undiagnosedFraction:0.49,     // Kotaniemi et al. 2005
+  spirometryConfirmation:0.80,  // spirometry confirms COPD in true-positive referrals
+  spirometryCost:110,           // EUR per spirometry (Laru-Sompa 2020)
+  acuteCarePerPatient:509,      // EUR/yr: avoided hospitalisations (450) + ER visits (59)
+  copdSpecificDelta:218,        // EUR/yr: COPD-specific cost delta non-severe vs severe (medication + outpatient, excl. hospitalisations)
+  progressionRate:0.40,         // fraction of undiagnosed who would progress to severe within 10yr
+  adherence:0.64,               // 80% pickup × 80% ingestion
+  qalyPerDx:0.3,                // QALY per early diagnosis. Lambe 2019: 0.028/screened, ÷8.8% prevalence = 0.32/COPD case. Using 0.3 (conservative)
+  discountRate:0.035,           // Finnish public sector discount rate
+  gpCostPerReferral:15,         // EUR per flag review (~5min of loaded GP time)
+  pharmaMarketShare:0.12,        // weighted avg for a single pharma partner: 0% GOLD A, ~5-10% GOLD B, ~35% of 30-40% who escalate
+  pharmaRevenuePerPatient:1000,  // avg annual medication revenue per patient on partner's therapy
+  // National expansion: population multiplier per year + integration costs
+  // Year 0-1: Helsinki/Apotti (1.7M, 1×), Year 2: +Lifecare (2.0M, 2.2×), Year 3+: +OMNI360+Esko (1.9M, 3.3×)
+  expansionMultiplier:[1.0, 1.0, 2.2, 3.3, 3.3],
+  expansionIntegrationCost:[0, 0, 120000, 150000, 0] // EUR: Lifecare in Y2, OMNI360+Esko in Y3
+};
+var SLIDERS=[
+  {id:'clickThrough',label:'Form click-through rate',min:5,max:65,step:1,unit:'%'},
+  {id:'completion',label:'Form completion rate',min:30,max:95,step:1,unit:'%'},
+  {id:'prevalence',label:'COPD prevalence in pool',min:8,max:28,step:1,unit:'%'},
+  {id:'sensitivity',label:'Screening sensitivity',min:35,max:95,step:1,unit:'%'},
+  {id:'specificity',label:'Screening specificity',min:55,max:95,step:1,unit:'%'},
+  {id:'physicianEngagement',label:'Physician engagement',min:5,max:85,step:1,unit:'%'},
+  {id:'devCost',label:'Development cost',min:80,max:650,step:10,unit:'k\u20AC'},
+  {id:'opsCost',label:'Annual operations',min:50,max:250,step:5,unit:'k\u20AC'},
+];
+var SCENARIOS={
+  pessimistic:{clickThrough:20,completion:55,prevalence:15,sensitivity:55,specificity:75,physicianEngagement:30,devCost:280,opsCost:110},
+  base:{clickThrough:35,completion:70,prevalence:18,sensitivity:70,specificity:80,physicianEngagement:50,devCost:200,opsCost:140},
+  optimistic:{clickThrough:50,completion:85,prevalence:20,sensitivity:85,specificity:90,physicianEngagement:70,devCost:350,opsCost:170},
+};
+var FUNDING_LABELS={public:'County bears all costs',ppp:'Pharma co-funds dev \u00B7 Grant: validation \u00B7 County: operations'};
+var currentValues=Object.assign({},SCENARIOS.base);
+var currentFunding='ppp';
+
+// ── Funding model: who pays what ──
+function fundingSplit(r){
+  // All values from years array are in PV terms. Sum consistently.
+  var devPV=r.years[0].devCost; // already discounted (year 0, disc=1, so same as nominal)
+  var opsPV=r.years.reduce(function(s,y){return s+y.opsCost;},0);
+  var spiroPV=r.years.reduce(function(s,y){return s+y.spiroCost+y.gpCost;},0);
+  var total=r.totalCost,savings=r.totalSavings;
+  if(currentFunding==='public')return{
+    label:'County Perspective',county_cost:total,county_return:savings,pharma_cost:0,grant:0,
+    primary_invest:total,primary_return:savings};
+  // ppp: pharma co-funds dev, grant covers validation, county runs ops + spiro
+  var grantAmt=Math.round(devPV*0.3);
+  var countyCost=opsPV+spiroPV;
+  return{label:'Partnership Overview',county_cost:countyCost,county_return:savings,pharma_cost:devPV-grantAmt,grant:grantAmt,
+    primary_invest:countyCost,primary_return:savings};
+}
+
+// ── Core calc ──
+// MULTI-TOUCH: patients get ~3 SMS/year. Annual screening probability compounds.
+// POPULATION-LEVEL: pools track full eligible population, not just one year's screened subset.
+// MUTUALLY EXCLUSIVE SAVINGS: acute care avoidance vs disease progression (no overlap).
+// ADHERENCE-ADJUSTED: 64% effective adherence (80% pickup × 80% ingestion).
+// DISCOUNTED: 3.5% annual discount rate on future cash flows.
+// FP POOL DEPLETION: non-COPD patients cleared by negative spirometry are not re-referred.
+// PHYSICIAN ADAPTATION: engagement drifts based on positive predictive value of flags.
+function calc(v){
+  var C=CONSTANTS;var ct=v.clickThrough/100,comp=v.completion/100,prev=v.prevalence/100;
+  var sens=v.sensitivity/100,spec=v.specificity/100,eng=v.physicianEngagement/100;
+  var devCost=v.devCost*1000,opsCost=v.opsCost*1000;
+
+  // MULTI-TOUCH SCREENING: compound annual probability from multiple visits
+  var perVisitCompletion=C.smsDelivery*ct*comp;
+  var annualProb=1-Math.pow(1-perVisitCompletion,C.visitsPerYear);
+  var uniqueScreened=Math.round(C.uniquePatients*annualProb);
+
+  // POPULATION-LEVEL POOLS — start with Helsinki, expand nationally
+  // Year 0-1: Apotti (1.7M, 1×). Year 2: +Lifecare (2.2×). Year 3+: full national (3.3×).
+  var baseUndiag=Math.round(C.uniquePatients*prev*C.undiagnosedFraction);
+  var baseNonCOPD=Math.round(C.uniquePatients*(1-prev));
+
+  // YEAR 1 FUNNEL (for display — Helsinki only)
+  var y1COPD=Math.round(uniqueScreened*prev);
+  var y1Undiag=Math.round(y1COPD*C.undiagnosedFraction);
+  var y1TP=Math.round(y1Undiag*sens);
+  var y1FP=Math.round((uniqueScreened-y1COPD)*(1-spec));
+  var y1SpiroTP=Math.round(y1TP*eng);
+  var y1SpiroFP=Math.round(y1FP*eng);
+  var y1Dx=Math.round(y1SpiroTP*C.spirometryConfirmation);
+
+  // YEAR-BY-YEAR SIMULATION with national expansion
+  var undiagPool=baseUndiag;
+  var fpUntestedPool=baseNonCOPD;
+  var curEng=eng;
+  var prevMultiplier=0; // track expansion to add new pools
+
+  var years=[],cumDx=0,cumCostPV=0,cumSavingsPV=0;
+  for(var y=0;y<5;y++){
+    var disc=1/Math.pow(1+C.discountRate,y);
+    var mult=C.expansionMultiplier[y];
+
+    // When regions expand, add new undiagnosed + non-COPD pools
+    if(mult>prevMultiplier+0.01){
+      var addedFraction=(mult-prevMultiplier)/mult; // fraction of current pool that is new
+      var newPatientsBase=Math.round(C.uniquePatients*(mult-prevMultiplier));
+      undiagPool+=Math.round(newPatientsBase*prev*C.undiagnosedFraction);
+      fpUntestedPool+=Math.round(newPatientsBase*(1-prev));
+      prevMultiplier=mult;
+    }
+
+    // Scale screening probability by current multiplier (more patients = same per-patient rate)
+    var yearScreened=Math.round(C.uniquePatients*mult*annualProb);
+
+    // TRUE POSITIVES: fraction of remaining undiagnosed pool gets screened
+    var tpScreened=Math.round(undiagPool*annualProb);
+    var yearTP=Math.round(tpScreened*sens);
+    var yearSpiroTP=Math.round(yearTP*curEng);
+    var yearDx=Math.round(yearSpiroTP*C.spirometryConfirmation);
+    undiagPool=Math.max(0,undiagPool-yearDx);
+
+    // FALSE POSITIVES: fraction of untested non-COPD pool gets screened and flagged
+    var fpScreened=Math.round(fpUntestedPool*annualProb);
+    var yearFP=Math.round(fpScreened*(1-spec));
+    var yearSpiroFP=Math.round(yearFP*curEng);
+    fpUntestedPool=Math.max(0,fpUntestedPool-yearSpiroFP);
+
+    // PHYSICIAN ENGAGEMENT: flat rate from slider.
+    // Kept simple — the slider IS the assumption. The pilot's primary purpose
+    // is to measure this rate, not predict it from a learning curve model.
+    var ppv=(yearTP+yearFP)>0?yearTP/(yearTP+yearFP):0;
+    curEng=eng; // flat — no adaptation modelled
+
+    cumDx+=yearDx;
+    var treated=cumDx-yearDx*0.5;
+
+    // COSTS (discounted — all PV)
+    var spiroCost=(yearSpiroTP+yearSpiroFP)*C.spirometryCost;
+    var gpCost=Math.round((yearSpiroTP+yearSpiroFP)*C.gpCostPerReferral);
+    var expansionCost=C.expansionIntegrationCost[y]||0; // EHR integration for new regions
+    // Scale ops cost by expansion (more regions = more ops, but sub-linear — shared infra)
+    var scaledOps=Math.round(opsCost*Math.sqrt(C.expansionMultiplier[y])); // sqrt = sub-linear scaling
+    var costsNominal=scaledOps+spiroCost+gpCost+expansionCost+(y===0?devCost:0);
+    var costsPV=Math.round(costsNominal*disc);
+
+    // SAVINGS (discounted, adherence-adjusted, severity-ramped)
+    // savA: Avoided acute care — ramps because GOLD A/B patients have low
+    // near-term hospitalisation risk. Year 0: 20%, full by year 4.
+    var acuteRamp=Math.min(0.2+y*0.2,1.0);
+    var savA=Math.round(treated*C.acuteCarePerPatient*acuteRamp*C.adherence*disc);
+    // savB: Avoided disease progression (non-acute)
+    var progRamp=y===0?0:Math.min(y/3,1);
+    var savB=Math.round(cumDx*C.copdSpecificDelta*C.progressionRate*progRamp*C.adherence*disc);
+    var savings=savA+savB;
+
+    // Store both nominal and PV for each year
+    var savingsNominal=Math.round(treated*C.acuteCarePerPatient*acuteRamp*C.adherence)
+      +Math.round(cumDx*C.copdSpecificDelta*C.progressionRate*progRamp*C.adherence);
+    var costsNominalStored=costsNominal; // for terminal value calc
+
+    cumCostPV+=costsPV;cumSavingsPV+=savings;
+    years.push({year:y,yearDx:yearDx,cumDx:cumDx,treated:Math.round(treated),
+      devCost:y===0?Math.round(devCost*disc):0,opsCost:Math.round(scaledOps*disc),
+      spiroCost:Math.round(spiroCost*disc),gpCost:Math.round(gpCost*disc),
+      expansionCost:Math.round(expansionCost*disc),
+      costs:costsPV,savA:savA,savB:savB,savings:savings,
+      net:savings-costsPV,cumNet:cumSavingsPV-cumCostPV,
+      engagement:curEng,ppv:ppv,multiplier:C.expansionMultiplier[y],
+      savingsNominal:savingsNominal,costsNominal:costsNominal});}
+
+  // TERMINAL VALUE: Growing perpetuity of Year 5 nominal net cash flow.
+  // Year 5 (index 4) costsNominal already excludes dev (one-time in Year 0).
+  // TV = CF_5_nominal × (1+g) / (r - g) / (1+r)^5
+  var y5=years[4];
+  var y5NetNominal=y5.savingsNominal-y5.costsNominal;
+  var gTV=0.01; // 1% perpetuity growth (conservative, below healthcare inflation)
+  var terminalValue=y5NetNominal>0?Math.round(y5NetNominal*(1+gTV)/(C.discountRate-gTV)/Math.pow(1+C.discountRate,5)):0;
+
+  var totalCost=cumCostPV,totalSavings=cumSavingsPV,roi=totalSavings/totalCost;
+  var costPerQaly=cumDx>0?totalCost/(cumDx*C.qalyPerDx):Infinity;
+  var paybackMonths=null,runningNet=0;
+  for(var yi=0;yi<5;yi++){var pn=runningNet;runningNet+=years[yi].net;
+    if(pn<0&&runningNet>=0){paybackMonths=Math.round((yi+(-pn/(runningNet-pn)))*12);break;}}
+
+  // PHARMA REVENUE: weighted by remaining years in model window
+  var pharmaRev=0;
+  for(var i=0;i<5;i++){var remYrs=Math.max(0,5-i-0.5);pharmaRev+=Math.round(years[i].yearDx*C.pharmaMarketShare*C.pharmaRevenuePerPatient*remYrs);}
+
+  return{screened:uniqueScreened,annualProb:annualProb,
+    copdInPool:y1COPD,undiagnosed:y1Undiag,
+    truePos:y1TP,falsePos:y1FP,spiroTrue:y1SpiroTP,spiroFalse:y1SpiroFP,
+    newDx:y1Dx,spiroCost:(y1SpiroTP+y1SpiroFP)*C.spirometryCost,
+    years:years,cumDx:cumDx,totalCost:totalCost,totalSavings:totalSavings,roi:roi,
+    costPerQaly:costPerQaly,paybackMonths:paybackMonths,devCost:devCost,opsCost:opsCost,
+    terminalValue:terminalValue,
+    pharmaPatients5yr:Math.round(cumDx*C.pharmaMarketShare),pharmaRevenue5yr:pharmaRev};
+}
+
+// ── Formatters ──
+function fmt(n){if(n==null||!isFinite(n))return'\u2014';if(Math.abs(n)>=1e6)return(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return(n/1e3).toFixed(0)+'k';return n.toLocaleString('en');}
+function fmtE(n){return'\u20AC'+fmt(n);}
+function fmtSigned(n){if(!isFinite(n))return'\u2014';return(n>=0?'+':'')+fmtE(n);}
+
+// ── UI builders ──
+var currentView='summary';
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('#view-btns .sel-btn').forEach(function(b){b.classList.toggle('active',b.dataset.v===v);});
+  document.getElementById('summary-view').classList.toggle('view-hidden',v!=='summary');
+  document.getElementById('full-model').classList.toggle('view-hidden',v!=='model');
+  // Re-render the active view's charts (they need correct canvas dimensions)
+  var r=calc(currentValues);
+  if(v==='model'){renderChart(r);renderFunnel(r);renderCashflow(r);renderSensitivity(r);}
+  else{renderDualPanels(r);}
+}
+function setFunding(f){currentFunding=f;
+  document.querySelectorAll('#funding-btns .sel-btn').forEach(function(b){b.classList.toggle('active',b.dataset.f===f);});recalc();}
+function loadScenario(name){currentValues=Object.assign({},SCENARIOS[name]);
+  document.querySelectorAll('#scenario-btns .sel-btn').forEach(function(b){b.classList.toggle('active',b.dataset.s===name);});
+  SLIDERS.forEach(function(s){document.getElementById('slider-'+s.id).value=currentValues[s.id];document.getElementById('val-'+s.id).textContent=currentValues[s.id]+s.unit;});recalc();}
+
+function buildSliders(){
+  var c=document.getElementById('sliders');while(c.firstChild)c.removeChild(c.firstChild);
+  SLIDERS.forEach(function(s){var val=currentValues[s.id];
+    var div=document.createElement('div');div.className='slider-group';
+    var lr=document.createElement('div');lr.className='slider-label';
+    var ns=document.createElement('span');ns.textContent=s.label;tip(ns,s.id);
+    var vs=document.createElement('span');vs.className='slider-val';vs.id='val-'+s.id;vs.textContent=val+s.unit;
+    lr.appendChild(ns);lr.appendChild(vs);
+    var inp=document.createElement('input');inp.type='range';inp.id='slider-'+s.id;inp.min=s.min;inp.max=s.max;inp.step=s.step;inp.value=val;
+    div.appendChild(lr);div.appendChild(inp);c.appendChild(div);
+    inp.addEventListener('input',function(){currentValues[s.id]=parseFloat(inp.value);document.getElementById('val-'+s.id).textContent=inp.value+s.unit;
+      document.querySelectorAll('#scenario-btns .sel-btn').forEach(function(b){b.classList.remove('active');});recalc();});});}
+
+function renderKPIs(r){
+  var el=document.getElementById('kpis');el.textContent='';
+  var fs=fundingSplit(r);var pri=fs.primary_invest,ret=fs.primary_return;
+  var priROI=pri>0?ret/pri:0;
+  var payback=r.paybackMonths?r.paybackMonths+' mo':'>60 mo';
+  var roiCls=priROI>=2?'green':priROI>=1?'yellow':'red';
+  var payCls=currentFunding==='private'?(payback.indexOf('>')>=0?'red':'green'):(r.paybackMonths&&r.paybackMonths<=24?'green':r.paybackMonths&&r.paybackMonths<=48?'yellow':'red');
+  var tvCls=r.terminalValue>0?'green':'yellow';
+  [['blue',fmt(r.cumDx),'5yr New Diagnoses','kpiDx'],
+   [roiCls,priROI.toFixed(1)+'\u00D7','5yr NPV ROI','kpiROI'],
+   [payCls,payback,'Payback Period','kpiPayback'],
+   ['orange',fmtE(r.costPerQaly),'Cost / QALY','kpiQALY'],
+   [tvCls,fmtE(r.terminalValue),'Terminal Value','kpiTV']
+  ].forEach(function(k){var d=document.createElement('div');d.className='kpi '+k[0];tip(d,k[3]);
+    var v=document.createElement('div');v.className='kpi-value';v.textContent=k[1];
+    var l=document.createElement('div');l.className='kpi-label';l.textContent=k[2];
+    d.appendChild(v);d.appendChild(l);el.appendChild(d);});}
+
+function renderFunnel(r){
+  var el=document.getElementById('funnel');el.textContent='';var C=CONSTANTS;
+  var pctAnn=Math.round(r.annualProb*100);
+  [['Eligible patients (smoking-exposed)',fmt(C.uniquePatients),'eligible'],
+   ['Per-SMS completion rate',Math.round(C.smsDelivery*currentValues.clickThrough/100*currentValues.completion/100*100)+'%','perSmsRate'],
+   ['Visits per patient per year',C.visitsPerYear.toFixed(1),'visitsPerYear'],
+   ['Annual screening probability',pctAnn+'%','annualProb'],
+   ['Unique patients screened / year',fmt(r.screened),'screened'],
+   ['COPD cases in pool',fmt(r.copdInPool),'copdInPool'],
+   ['Undiagnosed in pool (49%)',fmt(r.undiagnosed),'undiagnosed'],
+   ['Correctly flagged',fmt(r.truePos),'truePos'],
+   ['False positives flagged',fmt(r.falsePos),'falsePos'],
+   ['Spirometry referrals (TP)',fmt(r.spiroTrue),'spiroTP'],
+   ['Spirometry referrals (FP)',fmt(r.spiroFalse),'spiroFP'],
+   ['New COPD diagnoses',fmt(r.newDx),'newDx']
+  ].forEach(function(s){var row=document.createElement('div');row.className='funnel-step';
+    var lab=document.createElement('span');lab.className='label';lab.textContent=s[0];tip(lab,s[2]);
+    var val=document.createElement('span');val.className='val';val.textContent=s[1];
+    row.appendChild(lab);row.appendChild(val);el.appendChild(row);});}
+
+function makeTag(who){var t=document.createElement('span');t.className='tag tag-'+who;
+  t.textContent=who==='county'?'COUNTY':who==='pharma'?'PHARMA':'GRANT';return t;}
+
+function renderCashflow(r){
+  var el=document.getElementById('cashflow');el.textContent='';
+  document.getElementById('cf-perspective').textContent=FUNDING_LABELS[currentFunding];
+  var totals={devCost:0,opsCost:0,spiroCost:0,gpCost:0,costs:0,savA:0,savB:0,savings:0,net:0,yearDx:0};
+  r.years.forEach(function(y){for(var k in totals)totals[k]+=y[k];});
+  var hdr=document.createElement('tr');
+  ['','Yr 0','Yr 1','Yr 2','Yr 3','Yr 4','5yr Total'].forEach(function(t){var th=document.createElement('th');th.textContent=t;hdr.appendChild(th);});el.appendChild(hdr);
+
+  function addRow(label,key,isNeg,tipKey,payer){
+    var tr=document.createElement('tr');
+    var tdL=document.createElement('td');tdL.style.fontFamily='var(--font-heading)';tdL.style.fontSize='12px';
+    var labelSpan=document.createElement('span');labelSpan.textContent=label;if(tipKey)tip(labelSpan,tipKey);
+    tdL.appendChild(labelSpan);
+    if(payer&&currentFunding!=='public')tdL.appendChild(makeTag(payer));
+    tr.appendChild(tdL);
+    r.years.forEach(function(y){var td=document.createElement('td');td.className='num';var v=y[key];
+      if(isNeg&&v>0)td.style.color='var(--red)';else if(!isNeg&&v>0)td.style.color='var(--green)';
+      td.textContent=isNeg&&v>0?'-'+fmtE(v):(isNeg?fmtE(0):fmtE(v));tr.appendChild(td);});
+    var tdT=document.createElement('td');tdT.className='num';tdT.style.fontWeight='600';var tv=totals[key];
+    if(isNeg&&tv>0)tdT.style.color='var(--red)';else if(!isNeg&&tv>0)tdT.style.color='var(--green)';
+    tdT.textContent=isNeg&&tv>0?'-'+fmtE(tv):fmtE(tv);tr.appendChild(tdT);el.appendChild(tr);}
+
+  var devPayer=currentFunding==='public'?'county':'pharma';
+  var opsPayer='county';
+  addRow('Development','devCost',true,'cfDev',devPayer);
+  addRow('Operations','opsCost',true,'cfOps',opsPayer);
+  addRow('Spirometry (marginal)','spiroCost',true,'cfSpiro',opsPayer);
+  addRow('GP flag review','gpCost',true,'cfGP',opsPayer);
+
+  // Totals row
+  var cTr=document.createElement('tr');cTr.className='total';var cL=document.createElement('td');cL.textContent='Total costs';cL.style.fontFamily='var(--font-heading)';cL.style.fontSize='12px';cTr.appendChild(cL);
+  r.years.forEach(function(y){var td=document.createElement('td');td.className='num';td.style.color='var(--red)';td.textContent='-'+fmtE(y.costs);cTr.appendChild(td);});
+  var cT=document.createElement('td');cT.className='num';cT.style.color='var(--red)';cT.style.fontWeight='600';cT.textContent='-'+fmtE(totals.costs);cTr.appendChild(cT);el.appendChild(cTr);
+
+  addRow('Acute care avoidance','savA',false,'cfAcute');
+  addRow('Disease progression','savB',false,'cfProgression');
+
+  var sTr=document.createElement('tr');sTr.className='total';var sL=document.createElement('td');sL.textContent='Total savings';sL.style.fontFamily='var(--font-heading)';sL.style.fontSize='12px';sTr.appendChild(sL);
+  r.years.forEach(function(y){var td=document.createElement('td');td.className='num';td.style.color='var(--green)';td.textContent=fmtE(y.savings);sTr.appendChild(td);});
+  var sT=document.createElement('td');sT.className='num';sT.style.color='var(--green)';sT.style.fontWeight='600';sT.textContent=fmtE(totals.savings);sTr.appendChild(sT);el.appendChild(sTr);
+
+  var nTr=document.createElement('tr');nTr.className='total';var nL=document.createElement('td');nL.textContent='Net cash flow';nL.style.fontFamily='var(--font-heading)';nL.style.fontSize='12px';nTr.appendChild(nL);
+  r.years.forEach(function(y){var td=document.createElement('td');td.className='num';td.style.color=y.net>=0?'var(--green)':'var(--red)';td.textContent=fmtSigned(y.net);nTr.appendChild(td);});
+  var nT=document.createElement('td');nT.className='num';nT.style.color=totals.net>=0?'var(--green)':'var(--red)';nT.style.fontWeight='600';nT.textContent=fmtSigned(totals.net);nTr.appendChild(nT);el.appendChild(nTr);
+
+  var cuTr=document.createElement('tr');var cuL=document.createElement('td');cuL.textContent='Cumulative';cuL.style.color='var(--muted)';cuL.style.fontFamily='var(--font-heading)';cuL.style.fontSize='12px';cuTr.appendChild(cuL);
+  r.years.forEach(function(y){var td=document.createElement('td');td.className='num';td.style.color=y.cumNet>=0?'var(--green)':'var(--red)';td.textContent=fmtSigned(y.cumNet);cuTr.appendChild(td);});cuTr.appendChild(document.createElement('td'));el.appendChild(cuTr);
+
+  var dTr=document.createElement('tr');var dL=document.createElement('td');dL.textContent='New diagnoses';dL.style.color='var(--muted)';dL.style.fontFamily='var(--font-heading)';dL.style.fontSize='12px';dTr.appendChild(dL);
+  r.years.forEach(function(y){var td=document.createElement('td');td.className='num';td.textContent=y.yearDx;dTr.appendChild(td);});
+  var dT=document.createElement('td');dT.className='num';dT.style.fontWeight='600';dT.textContent=r.cumDx;dTr.appendChild(dT);el.appendChild(dTr);}
+
+function renderChart(r){
+  var canvas=document.getElementById('chart');var dpr=window.devicePixelRatio||1;var rect=canvas.getBoundingClientRect();canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);var W=rect.width,H=rect.height;ctx.clearRect(0,0,W,H);
+  var pad={top:20,right:20,bottom:30,left:60};var plotW=W-pad.left-pad.right,plotH=H-pad.top-pad.bottom;
+  var costs=r.years.map(function(y){return -y.costs;}),savings=r.years.map(function(y){return y.savings;}),cumNet=r.years.map(function(y){return y.cumNet;});
+  var allVals=costs.concat(savings).concat(cumNet);var maxVal=Math.max.apply(null,allVals.map(Math.abs).concat([1]))*1.15;var yMin=-maxVal,yMax=maxVal;
+  function xScale(i){return pad.left+(i+0.5)*(plotW/5);}function yScale(v){return pad.top+plotH*(1-(v-yMin)/(yMax-yMin));}
+  ctx.font='10px Poppins, sans-serif';
+  for(var t=0;t<=5;t++){var tv=yMin+(yMax-yMin)*t/5;var ty=yScale(tv);ctx.strokeStyle='#e8e6dc';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(pad.left,ty);ctx.lineTo(W-pad.right,ty);ctx.stroke();ctx.fillStyle='#9e9a8f';ctx.textAlign='right';ctx.fillText(fmtE(Math.round(tv)),pad.left-6,ty+3);}
+  var y0=yScale(0);ctx.strokeStyle='#d0cdc4';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.left,y0);ctx.lineTo(W-pad.right,y0);ctx.stroke();
+  var barW=plotW/5*0.28;
+  for(var i=0;i<5;i++){var x=xScale(i);ctx.fillStyle='rgba(196,90,74,0.5)';ctx.fillRect(x-barW-2,y0,barW,yScale(costs[i])-y0);ctx.fillStyle='rgba(120,140,93,0.5)';var sh=y0-yScale(savings[i]);ctx.fillRect(x+2,y0-sh,barW,sh);}
+  ctx.strokeStyle='#d97757';ctx.lineWidth=2.5;ctx.beginPath();for(var j=0;j<5;j++){j===0?ctx.moveTo(xScale(j),yScale(cumNet[j])):ctx.lineTo(xScale(j),yScale(cumNet[j]));}ctx.stroke();
+  ctx.fillStyle='#d97757';for(var k=0;k<5;k++){ctx.beginPath();ctx.arc(xScale(k),yScale(cumNet[k]),4,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle='#9e9a8f';ctx.textAlign='center';for(var xi=0;xi<5;xi++)ctx.fillText('Y'+xi,xScale(xi),H-8);
+  ctx.textAlign='left';var lx=pad.left+8;ctx.fillStyle='rgba(196,90,74,0.5)';ctx.fillRect(lx,pad.top,10,10);ctx.fillStyle='#7a7668';ctx.fillText('Costs',lx+14,pad.top+9);ctx.fillStyle='rgba(120,140,93,0.5)';ctx.fillRect(lx+60,pad.top,10,10);ctx.fillStyle='#7a7668';ctx.fillText('Savings',lx+74,pad.top+9);ctx.fillStyle='#d97757';ctx.fillRect(lx+130,pad.top+3,16,3);ctx.fillStyle='#7a7668';ctx.fillText('Cumulative',lx+150,pad.top+9);}
+
+
+function renderSensitivity(r){
+  var el=document.getElementById('sensitivity');el.textContent='';var baseNPV=r.totalSavings-r.totalCost;
+  var tests=[{key:'clickThrough',label:'Form click-through'},{key:'physicianEngagement',label:'Physician engagement'},{key:'sensitivity',label:'Screening sensitivity'},{key:'prevalence',label:'COPD prevalence'},{key:'specificity',label:'Screening specificity'},{key:'devCost',label:'Development cost'},{key:'opsCost',label:'Operations cost'}];
+  var results=tests.map(function(t){var lo=Object.assign({},currentValues);lo[t.key]=currentValues[t.key]*0.5;
+    var hi=Object.assign({},currentValues);hi[t.key]=Math.min(currentValues[t.key]*1.5,95);
+    var rLo=calc(lo),rHi=calc(hi);return{key:t.key,label:t.label,npvLo:(rLo.totalSavings-rLo.totalCost)-baseNPV,npvHi:(rHi.totalSavings-rHi.totalCost)-baseNPV,swing:Math.abs(((rHi.totalSavings-rHi.totalCost)-(rLo.totalSavings-rLo.totalCost)))};
+  }).sort(function(a,b){return b.swing-a.swing;});
+  var maxSwing=results[0]?results[0].swing:1;
+  results.forEach(function(item){
+    var row=document.createElement('div');row.className='risk-bar';
+    var name=document.createElement('span');name.className='name';name.textContent=item.label;tip(name,item.key);
+    var impLo=document.createElement('span');impLo.className='impact';impLo.style.color=item.npvLo>=0?'var(--green)':'var(--red)';impLo.textContent=fmtSigned(item.npvLo);
+    var barC=document.createElement('div');barC.style.cssText='flex:1;display:flex;align-items:center;gap:2px';
+    var leftS=document.createElement('div');leftS.style.cssText='flex:1;display:flex;justify-content:flex-end';
+    var leftB=document.createElement('div');leftB.className='bar';leftB.style.width=(Math.abs(item.npvLo)/maxSwing*100)+'%';leftB.style.background=item.npvLo>=0?'var(--green)':'var(--red)';leftS.appendChild(leftB);
+    var mid=document.createElement('div');mid.style.cssText='width:2px;height:14px;background:var(--border-strong)';
+    var rightS=document.createElement('div');rightS.style.cssText='flex:1';
+    var rightB=document.createElement('div');rightB.className='bar';rightB.style.width=(Math.abs(item.npvHi)/maxSwing*100)+'%';rightB.style.background=item.npvHi>=0?'var(--green)':'var(--red)';rightS.appendChild(rightB);
+    barC.appendChild(leftS);barC.appendChild(mid);barC.appendChild(rightS);
+    var impHi=document.createElement('span');impHi.className='impact';impHi.style.color=item.npvHi>=0?'var(--green)':'var(--red)';impHi.textContent=fmtSigned(item.npvHi);
+    row.appendChild(name);row.appendChild(impLo);row.appendChild(barC);row.appendChild(impHi);el.appendChild(row);});}
+
+// ── Dual Panel Executive Summary ──
+function renderDualPanels(r){
+  var C=CONSTANTS;var grantAmt=Math.round(r.devCost*0.3);
+  var dualEl=document.getElementById('dual-panels');
+  var pharmaEl=document.getElementById('sp-pharma');
+  var countyEl=document.getElementById('sp-county');
+  var alignEl=document.getElementById('alignment-bar');
+
+  // Compute pharma yearly revenue
+  var pharmaInvest=currentFunding==='public'?0:r.devCost-grantAmt;
+  var pharmaCumRev=0,pharmaPayback=null,pharmaData=[];
+  for(var i=0;i<5;i++){
+    var yRev=Math.round(r.years[i].yearDx*C.pharmaMarketShare*C.pharmaRevenuePerPatient);
+    pharmaCumRev+=yRev;
+    pharmaData.push({rev:yRev,cumRev:pharmaCumRev});
+    if(!pharmaPayback&&pharmaCumRev>=pharmaInvest&&pharmaInvest>0){
+      if(i===0)pharmaPayback=Math.round(pharmaInvest/yRev*12);
+      else{var prev=pharmaData[i-1].cumRev;pharmaPayback=Math.round((i+(pharmaInvest-prev)/(pharmaCumRev-prev))*12);}
+    }
+  }
+  var pharmaROI=pharmaInvest>0?pharmaCumRev/pharmaInvest:0;
+
+  // Compute county yearly costs & savings
+  var countyCumCost=0,countyCumSav=0,countyPayback=null,countyData=[];
+  for(var i=0;i<5;i++){
+    var y=r.years[i];
+    var yCost=y.opsCost+y.spiroCost+y.gpCost+(currentFunding==='public'?y.devCost:0);
+    countyCumCost+=yCost;countyCumSav+=y.savings;
+    var cNet=countyCumSav-countyCumCost;
+    countyData.push({cost:yCost,sav:y.savings,cumCost:countyCumCost,cumSav:countyCumSav,cumNet:cNet});
+    if(!countyPayback&&cNet>=0&&i>0){
+      var prev=countyData[i-1].cumNet;countyPayback=Math.round((i+(-prev/(cNet-prev)))*12);
+    }
+  }
+  var countyROI=countyCumCost>0?countyCumSav/countyCumCost:0;
+
+  // Toggle single vs dual layout
+  if(currentFunding==='public'){
+    dualEl.className='dual-panels single';
+    pharmaEl.style.display='none';
+  }else{
+    dualEl.className='dual-panels';
+    pharmaEl.style.display='';
+  }
+
+  // PHARMA PANEL
+  if(currentFunding!=='public'){
+    pharmaEl.textContent='';
+    var ph=document.createElement('div');ph.className='side-header';
+    var ptag=document.createElement('span');ptag.className='tag tag-pharma';ptag.textContent='PHARMA';
+    var ph3=document.createElement('h3');ph3.textContent='Pharma Partner';
+    ph.appendChild(ptag);ph.appendChild(ph3);pharmaEl.appendChild(ph);
+
+    var pi=document.createElement('div');pi.className='side-invest';
+    var pamt=document.createElement('div');pamt.className='amount';pamt.style.color='var(--orange)';pamt.textContent=fmtE(pharmaInvest);
+    var plab=document.createElement('div');plab.className='label';plab.textContent='One-time development investment';
+    pi.appendChild(pamt);pi.appendChild(plab);pharmaEl.appendChild(pi);
+
+    // Mini chart
+    var pcv=document.createElement('canvas');pcv.className='mini';pcv.id='pharma-chart';pharmaEl.appendChild(pcv);
+
+    var pm=document.createElement('div');pm.className='side-metrics';
+    [[pharmaROI.toFixed(1)+'\u00D7','5yr ROI'],[pharmaPayback?pharmaPayback+' mo':'>60 mo','Payback'],
+     [fmt(r.pharmaPatients5yr),'Patients on therapy'],[fmtE(pharmaCumRev),'5yr medication rev']
+    ].forEach(function(m){var d=document.createElement('div');d.className='side-metric';
+      var v=document.createElement('div');v.className='mv';v.textContent=m[0];
+      var l=document.createElement('div');l.className='ml';l.textContent=m[1];
+      d.appendChild(v);d.appendChild(l);pm.appendChild(d);});
+    pharmaEl.appendChild(pm);
+
+    var pbul=document.createElement('ul');pbul.className='side-bullets';
+    ['Real-world evidence for respiratory portfolio','Replicable model for 30+ EU markets','12% weighted market share (GOLD A/B \u2192 ICS escalation)','Addressable market: '+fmt(r.cumDx)+' new patients identified','Disease awareness + health system partnership'
+    ].forEach(function(t){var li=document.createElement('li');li.textContent=t;pbul.appendChild(li);});
+    pharmaEl.appendChild(pbul);
+
+    var prisk=document.createElement('div');prisk.className='side-risk low';
+    prisk.textContent='Risk: '+fmtE(pharmaInvest)+' exposure \u2014 small relative to respiratory R&D budgets. Strategic optionality in 30+ EU markets.';
+    pharmaEl.appendChild(prisk);
+
+    // Draw pharma mini chart after DOM insert
+    setTimeout(function(){drawMiniChart('pharma-chart',pharmaData.map(function(d){return d.cumRev;}),pharmaInvest,'var(--orange)','Cum. revenue','Investment');},0);
+  }
+
+  // COUNTY PANEL
+  countyEl.textContent='';
+  var ch=document.createElement('div');ch.className='side-header';
+  var ctag=document.createElement('span');ctag.className='tag tag-county';ctag.textContent='COUNTY';
+  var ch3=document.createElement('h3');ch3.textContent='Wellbeing County (Helsinki/HUS)';
+  ch.appendChild(ctag);ch.appendChild(ch3);countyEl.appendChild(ch);
+
+  var ci=document.createElement('div');ci.className='side-invest';
+  var camt=document.createElement('div');camt.className='amount';camt.style.color='var(--blue)';
+  camt.textContent=currentFunding==='public'?fmtE(r.totalCost):fmtE(countyCumCost);
+  var clab=document.createElement('div');clab.className='label';
+  clab.textContent=currentFunding==='public'?'Total 5-year investment (dev + ops)':'5-year operations + spirometry';
+  ci.appendChild(camt);ci.appendChild(clab);countyEl.appendChild(ci);
+
+  var ccv=document.createElement('canvas');ccv.className='mini';ccv.id='county-chart';countyEl.appendChild(ccv);
+
+  var cm=document.createElement('div');cm.className='side-metrics';
+  [[countyROI.toFixed(1)+'\u00D7','5yr ROI'],[countyPayback?countyPayback+' mo':'>60 mo','Payback'],
+   [fmtE(r.costPerQaly),'Cost / QALY'],[fmt(r.cumDx),'New diagnoses (5yr)']
+  ].forEach(function(m){var d=document.createElement('div');d.className='side-metric';
+    var v=document.createElement('div');v.className='mv';v.textContent=m[0];
+    var l=document.createElement('div');l.className='ml';l.textContent=m[1];
+    d.appendChild(v);d.appendChild(l);cm.appendChild(d);});
+  countyEl.appendChild(cm);
+
+  var cbul=document.createElement('ul');cbul.className='side-bullets';
+  ['Avoided hospitalisations + ER visits','Disease progression prevention','Population health improvement','No medication cost burden (Kela + patient pays)',
+   currentFunding==='public'?'Full ownership \u2014 no pharma dependency':'Pharma funds dev \u2014 county only pays ops'
+  ].forEach(function(t){var li=document.createElement('li');li.textContent=t;cbul.appendChild(li);});
+  countyEl.appendChild(cbul);
+
+  var engRisk=r.years[0].engagement<0.3?'high':r.years[0].engagement<0.5?'med':'low';
+  var crisk=document.createElement('div');crisk.className='side-risk '+engRisk;
+  crisk.textContent='Key risk: physician engagement (currently '+Math.round(r.years[0].engagement*100)+'%). Low engagement \u2192 cost centre with no return.';
+  countyEl.appendChild(crisk);
+
+  setTimeout(function(){drawMiniChart('county-chart',countyData.map(function(d){return d.cumNet;}),0,'var(--blue)','Cum. net savings','Break-even');},0);
+
+  // Alignment bar
+  alignEl.textContent='';
+  if(currentFunding==='public'){
+    alignEl.textContent='County bears all costs and captures all savings. '+fmt(r.cumDx)+' new COPD diagnoses over 5 years. Terminal value: '+fmtE(r.terminalValue)+'.';
+  }else{
+    var t=document.createTextNode('More diagnoses \u2192 more medication revenue for pharma, fewer hospitalisations for county. ');
+    var b=document.createElement('strong');b.textContent=fmt(r.cumDx)+' shared diagnoses over 5 years.';
+    var t2=document.createTextNode(' Terminal value: '+fmtE(r.terminalValue)+'.');
+    alignEl.appendChild(t);alignEl.appendChild(b);alignEl.appendChild(t2);
+  }
+}
+
+function drawMiniChart(canvasId,values,threshold,color,lineLabel,threshLabel){
+  var canvas=document.getElementById(canvasId);if(!canvas)return;
+  var dpr=window.devicePixelRatio||1;var rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  var W=rect.width,H=rect.height;ctx.clearRect(0,0,W,H);
+  var pad={top:12,right:12,bottom:24,left:50};
+  var pW=W-pad.left-pad.right,pH=H-pad.top-pad.bottom;
+
+  var allV=values.concat([threshold]);
+  var vMin=Math.min.apply(null,allV),vMax=Math.max.apply(null,allV);
+  if(vMin>0)vMin=0;if(vMax<0)vMax=0;
+  var range=vMax-vMin||1;vMin-=range*0.1;vMax+=range*0.1;range=vMax-vMin;
+
+  function xS(i){return pad.left+(i+0.5)*(pW/5);}
+  function yS(v){return pad.top+pH*(1-(v-vMin)/range);}
+
+  // Grid
+  ctx.strokeStyle='#e8e6dc';ctx.lineWidth=0.5;
+  for(var t=0;t<=4;t++){var ty=pad.top+pH*t/4;ctx.beginPath();ctx.moveTo(pad.left,ty);ctx.lineTo(W-pad.right,ty);ctx.stroke();}
+
+  // Zero / threshold line
+  var y0=yS(threshold);
+  ctx.strokeStyle=threshold===0?'#d0cdc4':'rgba(217,119,87,0.4)';
+  ctx.lineWidth=1;ctx.setLineDash(threshold===0?[]:[4,4]);
+  ctx.beginPath();ctx.moveTo(pad.left,y0);ctx.lineTo(W-pad.right,y0);ctx.stroke();ctx.setLineDash([]);
+
+  // Area fill
+  ctx.beginPath();ctx.moveTo(xS(0),yS(values[0]));
+  for(var i=1;i<5;i++)ctx.lineTo(xS(i),yS(values[i]));
+  ctx.lineTo(xS(4),yS(0));ctx.lineTo(xS(0),yS(0));ctx.closePath();
+  var grad=ctx.createLinearGradient(0,pad.top,0,H-pad.bottom);
+  var c=color==='var(--blue)'?'106,155,204':'217,119,87';
+  grad.addColorStop(0,'rgba('+c+',0.15)');grad.addColorStop(1,'rgba('+c+',0.02)');
+  ctx.fillStyle=grad;ctx.fill();
+
+  // Line
+  ctx.strokeStyle=color==='var(--blue)'?'#6a9bcc':'#d97757';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(var i=0;i<5;i++){i===0?ctx.moveTo(xS(i),yS(values[i])):ctx.lineTo(xS(i),yS(values[i]));}
+  ctx.stroke();
+
+  // Dots
+  ctx.fillStyle=ctx.strokeStyle;
+  for(var i=0;i<5;i++){ctx.beginPath();ctx.arc(xS(i),yS(values[i]),3.5,0,Math.PI*2);ctx.fill();}
+
+  // X labels
+  ctx.fillStyle='#9e9a8f';ctx.font='10px Poppins,sans-serif';ctx.textAlign='center';
+  for(var i=0;i<5;i++)ctx.fillText('Y'+(i+1),xS(i),H-6);
+
+  // Y labels
+  ctx.textAlign='right';
+  for(var t=0;t<=4;t++){var v=vMin+(vMax-vMin)*((4-t)/4);ctx.fillText(fmtE(Math.round(v)),pad.left-4,pad.top+pH*t/4+3);}
+
+  // Threshold label
+  if(threshold!==0){ctx.fillStyle='#d97757';ctx.textAlign='left';ctx.fillText(threshLabel,pad.left+4,y0-5);}
+}
+
+function recalc(){var r=calc(currentValues);renderDualPanels(r);renderKPIs(r);renderFunnel(r);renderCashflow(r);renderChart(r);renderSensitivity(r);}
+buildSliders();recalc();
+window.addEventListener('resize',function(){var r=calc(currentValues);renderChart(r);renderDualPanels(r);});
+</script>
+
+<div style="margin-top:40px;padding-top:32px;border-top:2px solid var(--border-strong);">
+  <h1 style="font-size:22px;margin-bottom:16px;">Model Audit &amp; Adjustments</h1>
+  <p style="color:var(--dim);font-size:13px;margin-bottom:24px;">The following changes were made to the initial draft model after a systematic audit of every assumption. Each adjustment is listed with the original value, the corrected value, and the reasoning.</p>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">1. Multi-touch screening (was: single-touch per year)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> Each patient had one chance per year to complete the form. 115,000 eligible &times; 92% &times; 35% &times; 70% = ~26,000 screened.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> Patients visit primary care ~3 times per year (THL Avohilmo data: 2.5&ndash;3.5 general population; smokers higher; Helsinki 25&ndash;30% below national avg). Each visit sends an SMS. The probability of completing at least once compounds across visits.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Annual screening probability = 1 &minus; (1 &minus; per-SMS rate)<sup>visits/yr</sup>. With 3 visits and 22% per-SMS completion: ~53% annual probability &rarr; ~61,000 screened/yr. Roughly 2.4&times; the original estimate.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">2. Population-level pool depletion (was: screened-subset only)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> The undiagnosed pool was set to COPD cases within one year's screened subset (~2,300). This meant the pool depleted too fast because different patients get screened in different years.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> You don't screen the same 26,000 people every year. The actual undiagnosed pool in the full eligible population is ~10,000 (115,000 &times; 18% &times; 49%).</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Both the true-positive and false-positive pools are now tracked at the full eligible population level. Each year, a fraction of the remaining pool gets screened (based on annual screening probability), and diagnosed/cleared patients are removed. This produces a more realistic, slower decay in new diagnoses.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">3. False-positive spirometry depletion (was: flat every year)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> False-positive spirometry costs were fixed every year &mdash; same non-COPD patients get flagged, same spirometry gets ordered.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> A doctor who ordered spirometry for a patient last year and got a negative result won't re-order it this year. The EHR would also show the prior negative result.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> A "never-tested non-COPD pool" now tracks patients who haven't yet had negative spirometry. Each year's FP spirometry referrals deplete this pool. FP costs now decline over time as patients get cleared. This is conservative on costs (overestimates later-year spirometry spend less).</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">4. Mutually exclusive savings categories (was: overlapping)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> Three savings streams: hospitalisation avoidance (&euro;450/pt/yr), severity trajectory shift (&euro;9,250 lifetime), and ER avoidance (&euro;59/pt/yr). The severity shift figure included hospitalisation cost differences, creating double-counting estimated at 15&ndash;25%.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Fix:</strong> Two mutually exclusive categories: <em>Acute care avoidance</em> (hospitalisations + ER = &euro;509/pt/yr) and <em>Disease progression</em> (COPD-specific medication + outpatient costs only, &euro;218/yr delta &times; 40% progression rate). No hospitalisation component in the progression savings.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">5. Treatment adherence discount (was: 100% adherence assumed)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> All diagnosed patients were assumed to start treatment and stay on it, receiving the full benefit of early diagnosis.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> Real-world medication adherence: ~80% of prescriptions are picked up from the pharmacy, and ~80% of picked-up doses are actually taken. Effective adherence: 64%.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> All savings streams are multiplied by 0.64. This reduces per-patient savings by 36% &mdash; a significant and necessary correction.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">6. QALY per diagnosis: 1.0 &rarr; 0.5</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> 1.0 QALY per early diagnosis, based on 5 years earlier detection &times; 0.2 QALY/year.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> Literature central estimate is ~0.25 QALY/detected case (Lambe 2019, Jordan 2014). 0.5 is at the optimistic end (Lokke 2012, TLV Sweden), defensible only for Stage I detection with maximum lead time.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Base case now uses 0.5 QALY. This is optimistic but defensible given PUHELU targets early-stage detection (5&ndash;7 year lead time). The cost/QALY metric doubled as a result, but remains well within Finnish thresholds (&euro;30,000&ndash;50,000/QALY).</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">7. Medication costs excluded from county P&amp;L</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original audit flagged:</strong> Newly diagnosed patients going on COPD medication (&euro;1,000&ndash;1,200/yr) represents a real cost that wasn't modelled.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Resolution:</strong> In Finland, outpatient prescription medication is reimbursed by Kela (65% under special reimbursement code 203) and paid out-of-pocket by the patient (35%, capped at ~&euro;627/yr). The wellbeing county pays &euro;0 for outpatient medications. This is therefore not a county cost and correctly excluded from the county P&amp;L.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">8. Discount rate added (was: nominal values)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> All future values in nominal terms with no time-value-of-money adjustment.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> 3.5% annual discount rate applied to all future savings (standard Finnish public-sector rate). This reduces 5-year NPV of savings by ~15&ndash;20%.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">9. GP flag review cost added (was: not modelled)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> No cost for physician time spent reviewing flags and discussing with patients.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> &euro;15 per spirometry referral generated (~5 minutes of loaded GP time at ~&euro;110/hr). Small per-unit but adds up across thousands of referrals. Included for conservatism, even though the system is designed to integrate seamlessly into existing pre-appointment review.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">10. Physician engagement adaptation (was: fixed rate)</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> Physician engagement was a flat percentage every year, ignoring that doctors learn from outcomes.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Engagement now drifts based on the positive predictive value (PPV) of flags. If PPV &gt; 45% (doctors see flags leading to real diagnoses), engagement increases +3%/yr. If PPV &lt; 25% (too many false alarms), engagement drops &minus;5%/yr. This creates a feedback loop: good screening accuracy sustains physician trust.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">11. Pharma revenue: 25% &rarr; 12% market share</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> 25% market share for a single pharma partner, applied to all new COPD patients.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> PUHELU catches GOLD A/B patients. First-line therapy is LAMA monotherapy (Boehringer Spiriva dominates ~55%). A single pharma partner with ICS-focused portfolio has no leading first-line product &mdash; they capture value only when ~30&ndash;40% of patients escalate to ICS-containing therapy.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Weighted 5-year average: ~12% for a single partner. Revenue weighted by remaining model years per cohort. The pharma business case is broader than medication revenue: real-world evidence, disease awareness, EU replication model, health system partnerships. Model now uses generic &ldquo;pharma partner&rdquo; rather than naming a specific company.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">12. Pharma-led funding model removed</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> Three funding models: Public, Pharma-Led, Partnership.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> A screening tool funded entirely by the company that sells the medications it generates prescriptions for is a credibility problem. No healthcare system would trust that structure.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Removed pharma-led model. Two options remain: Public Funded and Partnership (PPP). In the PPP model, pharma co-funds development as one of several funders &mdash; participation is scoped and transparent, not driving the project. Pharma&rsquo;s commercial interest is documented as incentive alignment context, not a standalone investment thesis.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">13. Development cost assumptions refined</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> Dev cost slider range &euro;150k&ndash;650k with &euro;315k base case.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Fix:</strong> Slider range lowered to &euro;80k&ndash;650k. Base case reduced to &euro;200k (software ~&euro;80&ndash;100k + integration ~&euro;35&ndash;60k + validation ~&euro;40&ndash;70k). This explicitly <em>excludes</em> MDR Class IIa medical device certification (&euro;80&ndash;200k additional, flagged as a risk in the tooltip). Operations base case increased to &euro;140k (full-stack dev ~&euro;55&ndash;70k + part-time PM ~&euro;30&ndash;40k + infra + analysis).</p>
+  </div>
+
+  <div style="margin-top:24px;padding:16px 20px;background:var(--section-alt);border:1px solid var(--border);border-radius:var(--radius);">
+    <p style="font-family:var(--font-heading);font-size:12px;font-weight:600;color:var(--orange);margin-bottom:8px;">NET EFFECT OF ALL ADJUSTMENTS</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;">Adjustments 1&ndash;2 (multi-touch screening + population-level pools) <strong style="color:var(--green);">increase</strong> the number of diagnoses.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;">Adjustments 4&ndash;6 and 8 (exclusive savings, adherence, QALY, discounting) <strong style="color:var(--red);">decrease</strong> per-patient savings and inflate cost/QALY.</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;">Adjustments 3, 9 (FP depletion, GP cost) have <strong style="color:var(--dim);">minor mixed effects</strong>.</p>
+    <p style="font-size:13px;color:var(--dim);">The model is now more defensible: it finds more patients (corrected screening logic) but claims less savings per patient (adherence, no double-counting, discounting). The headline numbers may look different from the first draft, but they rest on ground you can defend to a health economist.</p>
+  </div>
+
+  <div style="margin-top:32px;">
+    <p style="font-family:var(--font-heading);font-size:12px;font-weight:600;color:var(--orange);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.06em;">PE Associate Review &mdash; Additional Fixes</p>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">14. Acute care savings ramp for early-stage patients</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Critique:</strong> PUHELU catches mostly GOLD A/B patients with low near-term hospitalisation risk. Applying the full &euro;509/pt/yr from Year 1 overstates early savings.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Acute care savings now ramp from 20% of the full rate in Year 0 (mild patients still avoid some ER/urgent visits) to 100% by Year 4 (as some of the cohort would have progressed to severe without treatment). This reduces Year 1 savings significantly but leaves the long-term trajectory intact.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">15. Consistent discounting of costs and savings</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Critique:</strong> The 3.5% discount rate was applied only to savings, not costs. Costs in future years should also be discounted to present value for a proper NPV comparison.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> All cash flows &mdash; both costs and savings &mdash; are now discounted at 3.5% annually. The P&amp;L shows present values throughout. This is standard DCF methodology.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">16. Terminal value added</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Critique:</strong> The model stopped at Year 5. Diagnosed patients continue generating savings for decades, and the system continues running. The 5-year ROI significantly understated the lifetime value.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Terminal value calculated as a growing perpetuity: Year 5 net savings &divide; (discount rate &minus; 1% growth rate), discounted to present. The 1% growth rate is conservative (below healthcare cost inflation). Terminal value is shown as a separate KPI, not mixed into the 5-year P&amp;L.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">17. Physician engagement: learning curve replaces arbitrary thresholds</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Critique:</strong> The &plusmn;3-5%/year drift based on PPV thresholds (45% and 25%) was arbitrary. Real physician behaviour change follows a learning curve over 2&ndash;3 years, not discrete annual steps.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Engagement now follows a logarithmic learning curve. Doctors build confidence over time as they see confirmed diagnoses from flags. Engagement drifts from the initial slider value toward a PPV-adjusted ceiling (high PPV &rarr; up to 75%, low PPV &rarr; down to 25%), with diminishing returns over ~5 years. This matches clinical informatics adoption literature where practice patterns plateau after 2&ndash;3 years.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+      <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">18. Visits per year: documented constant, not a slider</h2>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Critique:</strong> The PE review suggested making visits/year a slider since it&rsquo;s the single biggest driver of screening volume.</p>
+      <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Decision:</strong> Kept as a documented constant at 3.0. This is a verifiable fact from Eurostat (Finland: 4.4 total consultations/capita/year, 2023) adjusted down for Helsinki + smoking-exposed population characteristics. It should not be an assumption to play with &mdash; it should be measured from Apotti appointment data in the pilot.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
