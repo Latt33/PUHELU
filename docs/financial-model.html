@@ -164,7 +164,16 @@
     </div>
     <!-- FULL MODEL VIEW -->
     <div id="full-model" class="view-hidden">
-      <div class="panel"><h2>Screening Funnel</h2><div id="funnel"></div></div>
+      <div id="funnel-toggle-bar" style="display:none;margin-bottom:12px;">
+        <button onclick="document.getElementById('funnel-panel').style.display='';document.getElementById('funnel-toggle-bar').style.display='none';" style="font-family:var(--font-heading);font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px 14px;cursor:pointer;">Show screening funnel</button>
+      </div>
+      <div class="panel" id="funnel-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h2 style="margin-bottom:0;">Screening Funnel</h2>
+          <button onclick="document.getElementById('funnel-panel').style.display='none';document.getElementById('funnel-toggle-bar').style.display='block';" style="font-family:var(--font-heading);font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;cursor:pointer;">Hide</button>
+        </div>
+        <div id="funnel"></div>
+      </div>
       <div class="panel">
         <div class="section-label">5-Year Cash Flow (NPV) &mdash; <span id="cf-perspective"></span></div>
         <table id="cashflow"></table>
