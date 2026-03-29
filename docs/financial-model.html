@@ -186,7 +186,7 @@ var TIPS = {
   clickThrough:['Form click-through rate','Percentage of patients who receive the SMS and click the link to open the screening form. Health SMS click-through benchmarks range 15\u201355% depending on wording and patient demographics.','Opened \u00F7 SMS delivered'],
   completion:['Form completion rate','Of patients who opened the form, how many finish all questions including the vocalization task. One-question-at-a-time design and <3 min length help maximize this.','Completed \u00F7 Opened'],
   prevalence:['COPD prevalence in pool','Estimated COPD rate among the screened population. Higher than the 6% general population rate because this pool is pre-selected by smoking history. Literature supports 15\u201325% for smoking-exposed primary care visitors.','Based on Kotaniemi et al. 2005'],
-  sensitivity:['Screening sensitivity','True positive rate: what percentage of actual COPD cases the screening correctly flags. Higher sensitivity catches more cases but may increase false positives. CAT questionnaire alone: ~60\u201370%. Vocal biomarker adds supplementary signal.','True positives \u00F7 All actual COPD cases'],
+  sensitivity:['Screening sensitivity','True positive rate: what percentage of actual COPD cases the screening correctly flags. PUHELU operates on a pre-selected smoking-exposed population with a custom branching questionnaire + vocal biomarker \u2014 higher achievable sensitivity than generic screening. 80% base case is realistic for this design. The pre-selection also protects specificity (non-smokers never enter the COPD path).','True positives \u00F7 All actual COPD cases'],
   specificity:['Screening specificity','True negative rate: what percentage of non-COPD patients the screening correctly clears. THIS IS THE BIGGEST COST DRIVER. At 80% specificity with population-level screening, thousands of false positives generate spirometry referrals. Each 5% improvement in specificity saves ~\u20AC140k/yr in avoided spirometries. The system\u2019s scoring threshold should be tuned to control false positive volume.','1 \u2212 (False positives \u00F7 All non-COPD patients)'],
   physicianEngagement:['Physician engagement','Of all flagged patients, what percentage actually get a spirometry referral from the doctor. This is the single most uncertain and highest-impact variable. Alert fatigue, trust in the system, and flag placement in the EHR all affect this.','Spirometry ordered \u00F7 Flags shown to doctor'],
   devCost:['Development cost','One-time investment: platform build (form engine, scoring, voice ML), Apotti FHIR R4 integration, clinical validation. Does NOT include full MDR Class IIa certification \u2014 if PUHELU is classified as a medical device, add \u20AC80\u2013200k and 6\u201318 months.','Software: ~\u20AC80\u2013100k. Integration: ~\u20AC35\u201360k. Validation: ~\u20AC40\u201370k.'],
@@ -212,8 +212,10 @@ var TIPS = {
   cfOps:['Operations','Annual: developer, PM, hosting, monitoring, clinical oversight, reporting.','Paid each year of the pilot'],
   cfSpiro:['Spirometry (marginal)','Marginal spirometries triggered by PUHELU. Both TP and FP referrals decay: TP shrinks as undiagnosed pool depletes. FP shrinks as non-COPD patients get cleared by negative spirometry (doctors don\u2019t re-refer). Many patients would eventually get spirometry during acute episodes anyway.','(TP + FP referrals) \u00D7 \u20AC110 \u2014 both pools deplete'],
   cfGP:['GP flag review','Doctor time to review each flag and discuss with patient. ~5 min of loaded GP time per spirometry referral.','Spirometry referrals \u00D7 \u20AC15'],
-  cfAcute:['Acute care avoidance','Avoided hospitalisations + ER visits = \u20AC509/pt/yr at full severity. Derived from: \u20AC590/day secondary care (Herse et al., npj PCRM 2015) + \u20AC195/ER visit (Viinanen et al., Int J COPD 2019). Cross-check: ARCTIC study (Lisspers et al., Int J COPD 2018) found \u20AC1,278/yr savings from early vs late diagnosis \u2014 our figure is conservative. Severity-ramped: 20% Year 0 \u2192 100% Year 4 (GOLD A/B patients have low near-term hosp. risk). Adherence-adjusted (64%) and discounted (3.5%).','Treated \u00D7 \u20AC509 \u00D7 severity ramp \u00D7 64% \u00D7 discount'],
+  cfAcute:['Acute care avoidance','Avoided hospitalisations + ER visits = \u20AC713/pt/yr at full severity. Base: \u20AC590/day secondary care (Herse 2015) + \u20AC195 ER (Viinanen 2019) = \u20AC509, then \u00D71.4 inflation adjustment (2010\u21922024, ~2.5%/yr healthcare cost inflation). Cross-check: ARCTIC study (Lisspers et al., Int J COPD 2018) found \u20AC1,278/yr \u2014 our figure is still 44% below that. Severity-ramped: 20% Y0 \u2192 100% Y4. Adherence-adjusted (64%). Discounted (3.5%).','Treated \u00D7 \u20AC713 \u00D7 severity ramp \u00D7 64% \u00D7 discount'],
   cfProgression:['Disease progression avoidance','Avoided medication escalation + COPD outpatient costs. COPD-specific cost delta: \u20AC218/yr non-severe vs severe (Viinanen et al., Int J COPD 2019: \u20AC319 vs \u20AC537). Progression rate 40%: Lung Health Study found 38% of continuing smokers with early COPD progressed to severe within 11yr (Anthonisen et al., AJRCCM 2002). Ramps years 1\u20133. Excludes hospitalisations (separate row). Medication costs paid by Kela (65%, code 203) + patient (35%, cap ~\u20AC627/yr), NOT by county.','Dx \u00D7 \u20AC218 \u00D7 40% \u00D7 ramp \u00D7 64% adherence \u00D7 discount'],
+  cfSocietal:['Societal savings','Indirect economic value from prevented COPD progression: reduced productivity loss (absenteeism, presenteeism, early retirement), lower disability benefit payments (Kela), reduced informal caregiving burden. Literature consistently estimates indirect COPD costs at 1.5\u20132\u00D7 direct healthcare costs. Using 1.5\u00D7 (conservative). These savings accrue to employers, Kela (disability), and families \u2014 not directly to the healthcare county budget, but represent real economic value for the public sector broadly.','Direct healthcare savings \u00D7 0.5 (the additional societal portion)'],
+  cfCessation:['Smoking cessation effect','COPD diagnosis is a strong trigger for smoking cessation (OR 1.4\u20131.8 increased quit rate vs undiagnosed). ~15% of diagnosed patients quit (conservative). Quitters have dramatically reduced disease progression: 10% progress to severe vs 38% for continuing smokers (Anthonisen et al., AJRCCM 2002). Savings from reduced exacerbations, slower FEV1 decline, and fewer hospitalisations. Effect ramps from Year 1 (cessation benefits take months to materialise).','Cumulative dx \u00D7 15% quit rate \u00D7 \u20AC1,000/yr \u00D7 ramp \u00D7 discount'],
   pCostQALY:['Cost per QALY','Accepted health-economic comparator. Finnish threshold ~\u20AC30,000\u201350,000/QALY. Most screening programs: \u20AC2,000\u201320,000/QALY.',''],
   pPharmaAlign:['Pharma value proposition','Established precedent: AZ+Pangaea AI-EHR screening for COPD (2025), GSK Salford Lung Study (NEJM), CAPTURE tool (JAMA 2023), FinnGen \u20AC59M PPP with 11 pharma partners. Beyond medication revenue, partners gain: (1) Real-world evidence for regulatory/HTA submissions, (2) HEOR data for payer negotiations, (3) Disease awareness and market shaping, (4) Health system KAM partnerships, (5) Academic publications (NEJM/JAMA precedent), (6) EU-replicable model. Compliant with EFPIA code + PIF (L\u00E4\u00E4keteollisuus ry) via unbranded design, HCP-initiated pathways, transparent scoring.','12% weighted share. Full precedent analysis: docs/pharma-screening-precedents.md'],
   pMaxRisk:['Max single-party risk','Under the PPP structure, the largest amount any one party needs to invest.','max(Dev cost, 5 \u00D7 Ops cost)'],
@@ -238,16 +240,19 @@ var CONSTANTS={
   smsDelivery:0.92,             // SMS delivery rate
   undiagnosedFraction:0.49,     // Kotaniemi et al. 2005
   spirometryConfirmation:0.80,  // spirometry confirms COPD in true-positive referrals
-  spirometryCost:110,           // EUR per spirometry (Laru-Sompa 2020)
-  acuteCarePerPatient:509,      // EUR/yr: avoided hospitalisations (450) + ER visits (59)
-  copdSpecificDelta:218,        // EUR/yr: COPD-specific cost delta non-severe vs severe (medication + outpatient, excl. hospitalisations)
+  spirometryCost:154,           // EUR per spirometry: 110 × 1.4 inflation adj from 2010 to 2024 (Viinanen 2019 base)
+  acuteCarePerPatient:713,      // EUR/yr: (450+59) × 1.4 inflation adj from 2010 to 2024. Cross-check: ARCTIC study (Lisspers 2018) found €1,278/yr — our figure is still conservative
+  copdSpecificDelta:305,        // EUR/yr: 218 × 1.4 inflation adj. COPD-specific cost delta non-severe vs severe (medication + outpatient, excl. hospitalisations)
   progressionRate:0.40,         // fraction of undiagnosed who would progress to severe within 10yr
   adherence:0.64,               // 80% pickup × 80% ingestion
+  smokingCessationRate:0.15,    // fraction of diagnosed who quit smoking (conservative; OR 1.4-1.8 from diagnosis)
+  cessationSavingsPerPatient:1000, // EUR/yr COPD-related savings per quitter (reduced exacerbations, slower decline)
+  societalCostMultiplier:1.5,   // indirect costs (productivity, disability, caregiving) as multiplier of direct savings. Conservative: literature suggests 1.5-2×
   qalyPerDx:0.3,                // QALY per early diagnosis. Lambe 2019: 0.028/screened, ÷8.8% prevalence = 0.32/COPD case. Using 0.3 (conservative)
   discountRate:0.035,           // Finnish public sector discount rate
-  gpCostPerReferral:15,         // EUR per flag review (~5min of loaded GP time)
+  gpCostPerReferral:21,         // EUR per flag review (~5min of loaded GP time, inflation-adjusted)
   pharmaMarketShare:0.12,        // weighted avg for a single pharma partner: 0% GOLD A, ~5-10% GOLD B, ~35% of 30-40% who escalate
-  pharmaRevenuePerPatient:1000,  // avg annual medication revenue per patient on partner's therapy
+  pharmaRevenuePerPatient:1200,  // avg annual medication revenue per patient on partner's therapy (inflation-adjusted, triple therapy growing)
   // National expansion: population multiplier per year + integration costs
   // Year 0-1: Helsinki/Apotti (1.7M, 1×), Year 2: +Lifecare (2.0M, 2.2×), Year 3+: +OMNI360+Esko (1.9M, 3.3×)
   expansionMultiplier:[1.0, 1.0, 2.2, 3.3, 3.3],
@@ -264,9 +269,9 @@ var SLIDERS=[
   {id:'opsCost',label:'Annual operations',min:50,max:250,step:5,unit:'k\u20AC'},
 ];
 var SCENARIOS={
-  pessimistic:{clickThrough:20,completion:55,prevalence:15,sensitivity:55,specificity:75,physicianEngagement:30,devCost:280,opsCost:110},
-  base:{clickThrough:35,completion:70,prevalence:18,sensitivity:70,specificity:80,physicianEngagement:50,devCost:200,opsCost:140},
-  optimistic:{clickThrough:50,completion:85,prevalence:20,sensitivity:85,specificity:90,physicianEngagement:70,devCost:350,opsCost:170},
+  pessimistic:{clickThrough:20,completion:55,prevalence:15,sensitivity:65,specificity:80,physicianEngagement:30,devCost:280,opsCost:110},
+  base:{clickThrough:35,completion:70,prevalence:18,sensitivity:80,specificity:88,physicianEngagement:50,devCost:200,opsCost:140},
+  optimistic:{clickThrough:50,completion:85,prevalence:20,sensitivity:90,specificity:93,physicianEngagement:70,devCost:350,opsCost:170},
 };
 var FUNDING_LABELS={public:'County bears all costs',ppp:'Pharma co-funds dev \u00B7 Grant: validation \u00B7 County: operations'};
 var currentValues=Object.assign({},SCENARIOS.base);
@@ -382,17 +387,28 @@ function calc(v){
     // savB: Avoided disease progression (non-acute)
     var progRamp=y===0?0:Math.min(y/3,1);
     var savB=Math.round(cumDx*C.copdSpecificDelta*C.progressionRate*progRamp*C.adherence*disc);
-    var savings=savA+savB;
+    // savC: Smoking cessation triggered by diagnosis
+    // ~15% of diagnosed patients quit. Quitters have slower disease progression
+    // and fewer exacerbations. Savings ramp from Year 1 (cessation takes time to show effect).
+    var cessRamp=y===0?0:Math.min(y/2,1); // half effect Y1, full from Y2
+    var savC=Math.round(cumDx*C.smokingCessationRate*C.cessationSavingsPerPatient*cessRamp*disc);
+    // savD: Societal savings (productivity, disability, caregiving) — not in county healthcare budget
+    // but real economic value. Modelled as multiplier of direct healthcare savings.
+    var directSavings=savA+savB+savC;
+    var savD=Math.round(directSavings*(C.societalCostMultiplier-1)); // the ADDITIONAL societal portion
+    var savings=directSavings+savD;
 
     // Store both nominal and PV for each year
-    var savingsNominal=Math.round(treated*C.acuteCarePerPatient*acuteRamp*C.adherence)
-      +Math.round(cumDx*C.copdSpecificDelta*C.progressionRate*progRamp*C.adherence);
+    var directNominal=Math.round(treated*C.acuteCarePerPatient*acuteRamp*C.adherence)
+      +Math.round(cumDx*C.copdSpecificDelta*C.progressionRate*progRamp*C.adherence)
+      +Math.round(cumDx*C.smokingCessationRate*C.cessationSavingsPerPatient*cessRamp);
+    var savingsNominal=Math.round(directNominal*C.societalCostMultiplier);
     cumCostPV+=costsPV;cumSavingsPV+=savings;
     years.push({year:y,yearDx:yearDx,cumDx:cumDx,treated:Math.round(treated),
       devCost:y===0?Math.round(devCost*disc):0,opsCost:Math.round(scaledOps*disc),
       spiroCost:Math.round(spiroCost*disc),gpCost:Math.round(gpCost*disc),
       expansionCost:Math.round(expansionCost*disc),
-      costs:costsPV,savA:savA,savB:savB,savings:savings,
+      costs:costsPV,savA:savA,savB:savB,savC:savC,savD:savD,savings:savings,
       net:savings-costsPV,cumNet:cumSavingsPV-cumCostPV,
       engagement:curEng,ppv:ppv,multiplier:C.expansionMultiplier[y],
       savingsNominal:savingsNominal,costsNominal:costsNominal});}
@@ -505,7 +521,7 @@ function makeTag(who){var t=document.createElement('span');t.className='tag tag-
 function renderCashflow(r){
   var el=document.getElementById('cashflow');el.textContent='';
   document.getElementById('cf-perspective').textContent=FUNDING_LABELS[currentFunding];
-  var totals={devCost:0,opsCost:0,spiroCost:0,gpCost:0,costs:0,savA:0,savB:0,savings:0,net:0,yearDx:0};
+  var totals={devCost:0,opsCost:0,spiroCost:0,gpCost:0,costs:0,savA:0,savB:0,savC:0,savD:0,savings:0,net:0,yearDx:0};
   r.years.forEach(function(y){for(var k in totals)totals[k]+=y[k];});
   var hdr=document.createElement('tr');
   ['','Yr 0','Yr 1','Yr 2','Yr 3','Yr 4','5yr Total'].forEach(function(t){var th=document.createElement('th');th.textContent=t;hdr.appendChild(th);});el.appendChild(hdr);
@@ -538,6 +554,8 @@ function renderCashflow(r){
 
   addRow('Acute care avoidance','savA',false,'cfAcute');
   addRow('Disease progression','savB',false,'cfProgression');
+  addRow('Smoking cessation effect','savC',false,'cfCessation');
+  addRow('Societal savings','savD',false,'cfSocietal');
 
   var sTr=document.createElement('tr');sTr.className='total';var sL=document.createElement('td');sL.textContent='Total savings';sL.style.fontFamily='var(--font-heading)';sL.style.fontSize='12px';sTr.appendChild(sL);
   r.years.forEach(function(y){var td=document.createElement('td');td.className='num';td.style.color='var(--green)';td.textContent=fmtE(y.savings);sTr.appendChild(td);});
