@@ -6,7 +6,7 @@
 
  - Benjam Indrenius
  - Atte Laakso
- - Miska Linström
+- Miska Lindström
  - Sophia Niklaus
 
  Overview
