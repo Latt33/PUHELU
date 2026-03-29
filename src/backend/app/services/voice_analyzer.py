@@ -34,13 +34,45 @@ def analyze_voice_audio(file_path: str):
         
         # Calculate max phonation time (MPT)
         mpt = len(y) / sr if sr else 0
-        
-        # Mock ML Risk Score
-        risk_score = np.random.randint(40, 85)
-        
-        # Determine status text
-        jitter_status = "Elevated" if risk_score > 60 else "Normal"
-        shimmer_status = "Normal"
+
+        # Estimate fundamental frequency (F0) per frame and compute jitter
+        try:
+            f0 = librosa.yin(y, fmin=50, fmax=500, sr=sr, frame_length=2048, hop_length=256)
+            # remove unvoiced frames
+            f0_clean = f0[~np.isnan(f0)]
+            if len(f0_clean) > 1:
+                periods = 1.0 / f0_clean
+                jitter_local = np.abs(np.diff(periods))
+                mean_period = np.mean(periods)
+                jitter_percent = 100.0 * np.mean(jitter_local) / mean_period if mean_period > 0 else 0.0
+            else:
+                jitter_percent = 0.0
+        except Exception:
+            jitter_percent = 0.0
+
+        # Compute shimmer from short-time RMS amplitude variations
+        try:
+            rms = librosa.feature.rms(y=y, frame_length=2048, hop_length=256)[0]
+            if len(rms) > 1 and np.mean(rms) > 0:
+                shimmer_local = np.abs(np.diff(rms))
+                shimmer_percent = 100.0 * np.mean(shimmer_local) / np.mean(rms)
+            else:
+                shimmer_percent = 0.0
+        except Exception:
+            shimmer_percent = 0.0
+
+        # Map metrics to a 0-100 risk score using simple, explainable thresholds
+        # Clinical-ish thresholds (heuristic): jitter ~1.5% abnormal, shimmer ~4% abnormal, MPT <15s increases risk
+        jitter_score = min(100.0, (jitter_percent / 1.5) * 100.0)
+        shimmer_score = min(100.0, (shimmer_percent / 4.0) * 100.0)
+        mpt_score = min(100.0, max(0.0, (15.0 - mpt) / 15.0 * 100.0))
+
+        # Weighted combination to produce a deterministic risk score
+        risk_score = round(0.5 * jitter_score + 0.3 * shimmer_score + 0.2 * mpt_score)
+
+        # Status labels
+        jitter_status = "Elevated" if jitter_percent > 1.5 else "Normal"
+        shimmer_status = "Elevated" if shimmer_percent > 4.0 else "Normal"
         
         # Generate the Mel-Spectrogram figure
         fig, ax = plt.subplots(figsize=(6, 4))
@@ -72,7 +104,9 @@ def analyze_voice_audio(file_path: str):
             "mpt": round(mpt, 2),
             "spectrogram_base64": img_base64,
             "jitter_status": jitter_status,
-            "shimmer_status": shimmer_status
+            "shimmer_status": shimmer_status,
+            "jitter_percent": round(float(jitter_percent), 3),
+            "shimmer_percent": round(float(shimmer_percent), 3)
         }
         
     except subprocess.CalledProcessError as e:

@@ -41,7 +41,8 @@ RUN mkdir -p $HOME/.cache/uv \
 USER app
 
 # Expose HTTP port
-EXPOSE 8000
+EXPOSE 8080
 
 # Run Uvicorn with multiple workers and proxy headers for production
-CMD ["sh", "-lc", "uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 4 --proxy-headers --log-level info"]
+# Default port changed to 8080 to match Railway runtime configuration.
+CMD ["sh", "-lc", "uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 4 --proxy-headers --log-level info"]

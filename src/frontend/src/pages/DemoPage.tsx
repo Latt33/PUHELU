@@ -74,6 +74,9 @@ export function DemoPage() {
   const [showIntro, setShowIntro] = useState(true);
   const [catIndex, setCatIndex] = useState(0);
 
+  const currentCatQuestion = CAT_QUESTIONS[catIndex];
+  const currentCatAnswered = patientData.catScores[currentCatQuestion.id] !== null;
+
   // Symptoms state
   const handleSymptomToggle = (symptom: string) => {
     if (patientData.symptoms.includes(symptom)) {
@@ -228,6 +231,8 @@ export function DemoPage() {
         cat_energy: patientData.catScores.cat_energy || 0,
         exacerbations_past_year: 0,
         hospitalized_past_year: false,
+        // Map smoking status string to boolean expected by backend
+        smoker_recent: (patientData.smokingStatus === 'Current')
       });
 
       // 2. Send Voice Data (if provided)
@@ -285,7 +290,7 @@ export function DemoPage() {
               <h2 className="text-2xl font-bold text-foreground mb-4">Demo Health Survey</h2>
               <p className="text-muted-foreground max-w-xl mb-8">This is a demo health survey that will be used to map general health status and screen for COPD. You'll be asked one question at a time.</p>
               <div className="flex gap-3">
-                <button onClick={() => setShowIntro(false)} className="bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-md">Start Survey</button>
+                <button onClick={() => setShowIntro(false)} className="bg-primary text-white font-semibold py-3 px-6 rounded-md">Start Survey</button>
               </div>
             </div>
           )}
@@ -326,7 +331,7 @@ export function DemoPage() {
                 <div className="mt-auto flex justify-end border-t border-muted/50 pt-6">
                 <button
                   onClick={() => setStep(1)}
-                  className="bg-primary text-primary-foreground font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
+                  className="bg-primary text-white font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
                 >
                   Continue <ArrowRight size={20} />
                 </button>
@@ -346,7 +351,7 @@ export function DemoPage() {
                     <button
                       key={opt}
                       onClick={() => setSmokingStatus(opt)}
-                      className={`w-full py-4 rounded-lg font-semibold border ${patientData.smokingStatus === opt ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-muted-foreground border-muted hover:bg-muted/30'}`}
+                      className={`w-full py-4 rounded-lg font-semibold border ${patientData.smokingStatus === opt ? 'bg-primary text-white border-primary' : 'bg-white text-muted-foreground border-muted hover:bg-muted/30'}`}
                     >
                       {opt}
                     </button>
@@ -354,7 +359,7 @@ export function DemoPage() {
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-between pt-6 border-t border-muted/50">
+                <div className="mt-6 flex justify-between pt-6 border-t border-muted/50">
                 <button
                   onClick={() => setStep(0)}
                   className="text-muted-foreground font-medium py-3 px-6 rounded-md hover:bg-muted transition-colors"
@@ -366,7 +371,7 @@ export function DemoPage() {
                     setCatIndex(0);
                     setStep(2);
                   }}
-                  className="bg-primary text-primary-foreground font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
+                  className="bg-primary text-white font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
                 >
                   Continue <ArrowRight size={20} />
                 </button>
@@ -395,15 +400,10 @@ export function DemoPage() {
                           <button
                             key={score}
                             onClick={() => {
+                              // only set the selected score; do NOT advance automatically
                               setCatScore(q.id, score);
-                              // auto-advance to next question, or to voice step if last
-                              if (catIndex < CAT_QUESTIONS.length - 1) {
-                                setCatIndex(prev => prev + 1);
-                              } else {
-                                setStep(3);
-                              }
                             }}
-                            className={`flex-1 py-3 sm:py-4 text-lg font-bold rounded-lg transition-all ${selected === score ? 'bg-primary text-primary-foreground shadow-md transform scale-105 border-primary' : 'bg-white text-muted-foreground border border-muted hover:bg-muted hover:border-muted'}`}
+                            className={`flex-1 py-3 sm:py-4 text-lg font-bold rounded-lg transition-all ${selected === score ? 'bg-primary text-white shadow-md transform scale-105 border-primary' : 'bg-white text-muted-foreground border border-muted hover:bg-muted hover:border-muted'}`}
                           >
                             {score}
                           </button>
@@ -437,7 +437,8 @@ export function DemoPage() {
                       setStep(3);
                     }
                   }}
-                  className="bg-primary text-primary-foreground font-semibold py-3 px-8 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
+                  disabled={!currentCatAnswered}
+                  className={`${currentCatAnswered ? 'bg-primary text-white hover:bg-primary/90' : 'bg-slate-300 text-muted-foreground cursor-not-allowed'} font-semibold py-3 px-8 rounded-md transition-colors flex items-center gap-2`}
                 >
                   Continue <ArrowRight size={20} />
                 </button>
@@ -454,7 +455,7 @@ export function DemoPage() {
                   <strong>Voice recording guidance:</strong>
                 </p>
                 <p className="text-foreground">
-                  Please produce a long, steady vowel sound (for example, "ahhh") while keeping your mouth about a palm's length away from the microphone.
+                  Please produce a long, steady vowel sound (for example, "aaaaa") while keeping your mouth about a palm's length away from the microphone.
                 </p>
               </div>
               
@@ -507,13 +508,13 @@ export function DemoPage() {
                     ) : (
                       <>
                         <div className="w-24 h-24 bg-white rounded-md flex items-center justify-center mb-6 shadow-sm border border-muted/50">
-                          <Mic className={`w-10 h-10 ${consentGiven ? 'text-primary' : 'text-muted-foreground/40'}`} />
+                          <Mic className={`w-10 h-10 ${consentGiven ? 'text-primary' : 'text-slate-300'}`} />
                         </div>
                         <p className="text-center text-muted-foreground mb-8 font-medium">Ready to record</p>
                         <button 
                           onClick={startRecording}
                           disabled={!consentGiven}
-                          className="w-full bg-primary text-primary-foreground font-bold py-4 px-8 rounded-md hover:bg-primary/90 transition-colors text-lg flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full bg-primary text-white font-bold py-4 px-8 rounded-md hover:bg-primary/90 transition-colors text-lg flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Mic size={24} /> Start Recording
                         </button>

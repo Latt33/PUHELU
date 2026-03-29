@@ -1,7 +1,7 @@
 import os
 import uuid
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.schemas.patient_schema import PatientIntake, RiskAnalysisResponse
+from app.schemas.patient_schema import PatientIntake, RiskAnalysisResponse, VoiceAnalysisResponse
 from app.services.copd_analyzer import analyze_copd_risk
 from app.services.voice_analyzer import analyze_voice_audio
 
@@ -17,7 +17,7 @@ def analyze_patient(patient: PatientIntake):
     # Delegate core clinical logic to the services module
     return analyze_copd_risk(patient)
 
-@router.post("/analyze-voice")
+@router.post("/analyze-voice", response_model=VoiceAnalysisResponse)
 async def analyze_voice(file: UploadFile = File(...)):
     if not file.content_type.startswith("audio/"):
         raise HTTPException(status_code=400, detail="Uploaded file must be an audio file.")
