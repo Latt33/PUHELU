@@ -31,4 +31,3 @@ Notes: Vite reads `VITE_` variables at build time — changing them requires a r
 curl -i https://puhelu-production.up.railway.app/api/v1/health
 ```
 
-If you'd like, I can commit this file for you and then guide you through adding the variables in the Vercel UI.
