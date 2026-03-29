@@ -384,8 +384,6 @@ function calc(v){
     // Store both nominal and PV for each year
     var savingsNominal=Math.round(treated*C.acuteCarePerPatient*acuteRamp*C.adherence)
       +Math.round(cumDx*C.copdSpecificDelta*C.progressionRate*progRamp*C.adherence);
-    var costsNominalStored=costsNominal; // for terminal value calc
-
     cumCostPV+=costsPV;cumSavingsPV+=savings;
     years.push({year:y,yearDx:yearDx,cumDx:cumDx,treated:Math.round(treated),
       devCost:y===0?Math.round(devCost*disc):0,opsCost:Math.round(scaledOps*disc),
