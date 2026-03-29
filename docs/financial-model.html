@@ -89,7 +89,7 @@
   /* Dual-panel executive summary */
   .exec-grid { display: grid; grid-template-columns: 280px 1fr; gap: 24px; margin-bottom: 24px; }
   .dual-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .dual-panels.single { grid-template-columns: 1fr; max-width: 560px; }
+  .dual-panels.single { grid-template-columns: 1fr; }
   .side-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
   .side-panel.pharma { border-top: 3px solid var(--orange); }
   .side-panel.county { border-top: 3px solid var(--blue); }
@@ -98,7 +98,7 @@
   .side-invest { font-family: var(--font-heading); margin-bottom: 12px; }
   .side-invest .amount { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
   .side-invest .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-  .side-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+  .side-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
   .side-metric { padding: 8px 10px; background: var(--section-alt); border-radius: 6px; }
   .side-metric .mv { font-family: var(--font-heading); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
   .side-metric .ml { font-family: var(--font-heading); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
@@ -130,13 +130,6 @@
     <div class="sel-group" id="view-btns">
       <button class="sel-btn active" data-v="summary" onclick="setView('summary')">Summary</button>
       <button class="sel-btn" data-v="model" onclick="setView('model')">Full Model</button>
-    </div>
-  </div>
-  <div>
-    <div class="sel-label">Funding Model</div>
-    <div class="sel-group" id="funding-btns">
-      <button class="sel-btn" data-f="public" onclick="setFunding('public')">Public Funded</button>
-      <button class="sel-btn active" data-f="ppp" onclick="setFunding('ppp')">Partnership (PPP)</button>
     </div>
   </div>
   <div>
@@ -286,23 +279,12 @@ var SCENARIOS={
 };
 var FUNDING_LABELS={public:'County bears all costs',ppp:'Pharma co-funds dev \u00B7 Grant: validation \u00B7 County: operations'};
 var currentValues=Object.assign({},SCENARIOS.base);
-var currentFunding='ppp';
+var currentFunding='public';
 
 // ── Funding model: who pays what ──
 function fundingSplit(r){
-  // All values from years array are in PV terms. Sum consistently.
-  var devPV=r.years[0].devCost;
-  var opsPV=r.years.reduce(function(s,y){return s+y.opsCost;},0);
-  var spiroPV=r.years.reduce(function(s,y){return s+y.spiroCost+y.gpCost+(y.expansionCost||0);},0);
-  var total=r.totalCost,savings=r.totalSavings;
-  if(currentFunding==='public')return{
-    label:'County Perspective',county_cost:total,county_return:savings,pharma_cost:0,grant:0,
-    primary_invest:total,primary_return:savings};
-  // ppp: pharma co-funds dev, grant covers validation, county runs ops + spiro
-  var grantAmt=Math.round(devPV*0.3);
-  var countyCost=opsPV+spiroPV;
-  return{label:'Partnership Overview',county_cost:countyCost,county_return:savings,pharma_cost:devPV-grantAmt,grant:grantAmt,
-    primary_invest:countyCost,primary_return:savings};
+  return{label:'County Perspective',county_cost:r.totalCost,county_return:r.totalSavings,
+    primary_invest:r.totalCost,primary_return:r.totalSavings};
 }
 
 // ── Core calc ──
@@ -468,13 +450,10 @@ function setView(v){
   document.querySelectorAll('#view-btns .sel-btn').forEach(function(b){b.classList.toggle('active',b.dataset.v===v);});
   document.getElementById('summary-view').classList.toggle('view-hidden',v!=='summary');
   document.getElementById('full-model').classList.toggle('view-hidden',v!=='model');
-  // Re-render the active view's charts (they need correct canvas dimensions)
   var r=calc(currentValues);
   if(v==='model'){renderChart(r);renderFunnel(r);renderCashflow(r);renderSensitivity(r);}
   else{renderDualPanels(r);}
 }
-function setFunding(f){currentFunding=f;
-  document.querySelectorAll('#funding-btns .sel-btn').forEach(function(b){b.classList.toggle('active',b.dataset.f===f);});recalc();}
 function loadScenario(name){currentValues=Object.assign({},SCENARIOS[name]);
   document.querySelectorAll('#scenario-btns .sel-btn').forEach(function(b){b.classList.toggle('active',b.dataset.s===name);});
   SLIDERS.forEach(function(s){document.getElementById('slider-'+s.id).value=currentValues[s.id];document.getElementById('val-'+s.id).textContent=currentValues[s.id]+s.unit;});recalc();}
@@ -634,31 +613,16 @@ function renderSensitivity(r){
 
 // ── Dual Panel Executive Summary ──
 function renderDualPanels(r){
-  var C=CONSTANTS;var grantAmt=Math.round(r.devCost*0.3);
   var dualEl=document.getElementById('dual-panels');
   var pharmaEl=document.getElementById('sp-pharma');
   var countyEl=document.getElementById('sp-county');
   var alignEl=document.getElementById('alignment-bar');
 
-  // Compute pharma yearly revenue
-  var pharmaInvest=currentFunding==='public'?0:r.devCost-grantAmt;
-  var pharmaCumRev=0,pharmaPayback=null,pharmaData=[];
-  for(var i=0;i<5;i++){
-    var yRev=Math.round(r.years[i].yearDx*C.pharmaMarketShare*C.pharmaRevenuePerPatient);
-    pharmaCumRev+=yRev;
-    pharmaData.push({rev:yRev,cumRev:pharmaCumRev});
-    if(!pharmaPayback&&pharmaCumRev>=pharmaInvest&&pharmaInvest>0){
-      if(i===0)pharmaPayback=Math.round(pharmaInvest/yRev*12);
-      else{var prev=pharmaData[i-1].cumRev;pharmaPayback=Math.round((i+(pharmaInvest-prev)/(pharmaCumRev-prev))*12);}
-    }
-  }
-  var pharmaROI=pharmaInvest>0?pharmaCumRev/pharmaInvest:0;
-
-  // Compute county yearly costs & savings
+  // County costs & savings by year
   var countyCumCost=0,countyCumSav=0,countyPayback=null,countyData=[];
   for(var i=0;i<5;i++){
     var y=r.years[i];
-    var yCost=y.opsCost+y.spiroCost+y.gpCost+(y.expansionCost||0)+(currentFunding==='public'?y.devCost:0);
+    var yCost=y.opsCost+y.spiroCost+y.gpCost+(y.expansionCost||0)+y.devCost;
     countyCumCost+=yCost;countyCumSav+=y.savings;
     var cNet=countyCumSav-countyCumCost;
     countyData.push({cost:yCost,sav:y.savings,cumCost:countyCumCost,cumSav:countyCumSav,cumNet:cNet});
@@ -668,71 +632,21 @@ function renderDualPanels(r){
   }
   var countyROI=countyCumCost>0?countyCumSav/countyCumCost:0;
 
-  // Toggle single vs dual layout
-  if(currentFunding==='public'){
-    dualEl.className='dual-panels single';
-    pharmaEl.style.display='none';
-  }else{
-    dualEl.className='dual-panels';
-    pharmaEl.style.display='';
-  }
+  dualEl.className='dual-panels single';
+  pharmaEl.style.display='none';
 
-  // PHARMA PANEL
-  if(currentFunding!=='public'){
-    pharmaEl.textContent='';
-    var ph=document.createElement('div');ph.className='side-header';
-    var ptag=document.createElement('span');ptag.className='tag tag-pharma';ptag.textContent='PHARMA';
-    var ph3=document.createElement('h3');ph3.textContent='Pharma Partner';
-    ph.appendChild(ptag);ph.appendChild(ph3);pharmaEl.appendChild(ph);
-
-    var pi=document.createElement('div');pi.className='side-invest';
-    var pamt=document.createElement('div');pamt.className='amount';pamt.style.color='var(--orange)';pamt.textContent=fmtE(pharmaInvest);
-    var plab=document.createElement('div');plab.className='label';plab.textContent='One-time development investment';
-    pi.appendChild(pamt);pi.appendChild(plab);pharmaEl.appendChild(pi);
-
-    // Mini chart
-    var pcv=document.createElement('canvas');pcv.className='mini';pcv.id='pharma-chart';pharmaEl.appendChild(pcv);
-
-    var pm=document.createElement('div');pm.className='side-metrics';
-    [[pharmaROI.toFixed(1)+'\u00D7','5yr ROI'],[pharmaPayback?pharmaPayback+' mo':'>60 mo','Payback'],
-     [fmt(r.pharmaPatients5yr),'Patients on therapy'],[fmtE(pharmaCumRev),'5yr medication rev']
-    ].forEach(function(m){var d=document.createElement('div');d.className='side-metric';
-      var v=document.createElement('div');v.className='mv';v.textContent=m[0];
-      var l=document.createElement('div');l.className='ml';l.textContent=m[1];
-      d.appendChild(v);d.appendChild(l);pm.appendChild(d);});
-    pharmaEl.appendChild(pm);
-
-    var pbul=document.createElement('ul');pbul.className='side-bullets';
-    ['RWE: validated screening cohort for HTA submissions','HEOR data for payer negotiations across EU markets','Market shaping: '+fmt(r.cumDx)+' newly diagnosed = expanded addressable population','Replicable model for 30+ EU markets (all FHIR-capable)','Health system partnership at county level','Unbranded, disease-centric, HCP-initiated (EFPIA/PIF compliant)'
-    ].forEach(function(t){var li=document.createElement('li');li.textContent=t;pbul.appendChild(li);});
-    pharmaEl.appendChild(pbul);
-
-    // Precedent note
-    var pprec=document.createElement('div');pprec.style.cssText='font-size:11px;color:var(--dim);margin-top:10px;padding:8px 10px;background:var(--section-alt);border-radius:4px;';
-    pprec.textContent='Precedent: Pharma-funded COPD case-finding (GSK Salford Lung Study, CAPTURE tool/JAMA 2023, AI-EHR screening partnerships). FinnGen: \u20AC59M Finnish PPP with 11 pharma partners.';
-    tip(pprec,'pPharmaAlign');
-    pharmaEl.appendChild(pprec);
-
-    var prisk=document.createElement('div');prisk.className='side-risk low';
-    prisk.textContent='Risk: '+fmtE(pharmaInvest)+' exposure \u2014 small relative to respiratory R&D budgets. Strategic optionality in 30+ EU markets.';
-    pharmaEl.appendChild(prisk);
-
-    // Draw pharma mini chart after DOM insert
-    setTimeout(function(){drawMiniChart('pharma-chart',pharmaData.map(function(d){return d.cumRev;}),pharmaInvest,'var(--orange)','Cum. revenue','Investment');},0);
-  }
-
-  // COUNTY PANEL
+  // COUNTY PANEL — full width
   countyEl.textContent='';
   var ch=document.createElement('div');ch.className='side-header';
-  var ctag=document.createElement('span');ctag.className='tag tag-county';ctag.textContent='COUNTY';
-  var ch3=document.createElement('h3');ch3.textContent='Wellbeing County (Helsinki/HUS)';
+  var ctag=document.createElement('span');ctag.className='tag tag-county';ctag.textContent='PUBLIC';
+  var ch3=document.createElement('h3');ch3.textContent='Wellbeing County (Helsinki \u00B7 Vantaa \u00B7 Kerava)';
   ch.appendChild(ctag);ch.appendChild(ch3);countyEl.appendChild(ch);
 
   var ci=document.createElement('div');ci.className='side-invest';
   var camt=document.createElement('div');camt.className='amount';camt.style.color='var(--blue)';
-  camt.textContent=currentFunding==='public'?fmtE(r.totalCost):fmtE(countyCumCost);
+  camt.textContent=fmtE(r.totalCost);
   var clab=document.createElement('div');clab.className='label';
-  clab.textContent=currentFunding==='public'?'Total 5-year investment (dev + ops)':'5-year operations + spirometry';
+  clab.textContent='Total 5-year investment (dev + ops + national expansion)';
   ci.appendChild(camt);ci.appendChild(clab);countyEl.appendChild(ci);
 
   var ccv=document.createElement('canvas');ccv.className='mini';ccv.id='county-chart';countyEl.appendChild(ccv);
@@ -747,8 +661,7 @@ function renderDualPanels(r){
   countyEl.appendChild(cm);
 
   var cbul=document.createElement('ul');cbul.className='side-bullets';
-  ['Avoided hospitalisations + ER visits','Disease progression prevention','Population health improvement','No medication cost burden (Kela + patient pays)',
-   currentFunding==='public'?'Full ownership \u2014 no pharma dependency':'Pharma funds dev \u2014 county only pays ops'
+  ['Avoided hospitalisations + ER visits','Disease progression prevention','Smoking cessation triggered by diagnosis','Population health improvement','No medication cost burden (Kela + patient pays)'
   ].forEach(function(t){var li=document.createElement('li');li.textContent=t;cbul.appendChild(li);});
   countyEl.appendChild(cbul);
 
@@ -759,16 +672,8 @@ function renderDualPanels(r){
 
   setTimeout(function(){drawMiniChart('county-chart',countyData.map(function(d){return d.cumNet;}),0,'var(--blue)','Cum. net savings','Break-even');},0);
 
-  // Alignment bar
-  alignEl.textContent='';
-  if(currentFunding==='public'){
-    alignEl.textContent='County bears all costs and captures all savings. '+fmt(r.cumDx)+' new COPD diagnoses over 5 years. Terminal value: '+fmtE(r.terminalValue)+'.';
-  }else{
-    var t=document.createTextNode('More diagnoses \u2192 more medication revenue for pharma, fewer hospitalisations for county. ');
-    var b=document.createElement('strong');b.textContent=fmt(r.cumDx)+' shared diagnoses over 5 years.';
-    var t2=document.createTextNode(' Terminal value: '+fmtE(r.terminalValue)+'.');
-    alignEl.appendChild(t);alignEl.appendChild(b);alignEl.appendChild(t2);
-  }
+  // Summary bar
+  alignEl.textContent=fmt(r.cumDx)+' new COPD diagnoses over 5 years (Helsinki \u2192 national). Terminal value: '+fmtE(r.terminalValue)+'.';
 }
 
 function drawMiniChart(canvasId,values,threshold,color,lineLabel,threshLabel){
