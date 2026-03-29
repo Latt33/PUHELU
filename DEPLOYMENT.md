@@ -9,8 +9,10 @@ git push origin master
 ```
 
 2) Frontend (Vercel) environment variables — required
-- `VITE_API_URL` = https://puhelu-production.up.railway.app
-- `VITE_API_PREFIX` = /api/v1
+-- `VITE_API_URL` = https://puhelu-production.up.railway.app
+-- `VITE_API_PREFIX` = /api/v1
+
+Note: the backend listens on port `8080` in production. Railway will forward traffic to the container port configured by the `PORT` environment variable. If you're testing locally with Docker Compose, the compose mapping now exposes `8080:8080`.
 
 Notes: Vite reads `VITE_` variables at build time — changing them requires a redeploy/rebuild.
 
