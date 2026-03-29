@@ -187,7 +187,7 @@ var TIPS = {
   completion:['Form completion rate','Of patients who opened the form, how many finish all questions including the vocalization task. One-question-at-a-time design and <3 min length help maximize this.','Completed \u00F7 Opened'],
   prevalence:['COPD prevalence in pool','Estimated COPD rate among the screened population. Higher than the 6% general population rate because this pool is pre-selected by smoking history. Literature supports 15\u201325% for smoking-exposed primary care visitors.','Based on Kotaniemi et al. 2005'],
   sensitivity:['Screening sensitivity','True positive rate: what percentage of actual COPD cases the screening correctly flags. Higher sensitivity catches more cases but may increase false positives. CAT questionnaire alone: ~60\u201370%. Vocal biomarker adds supplementary signal.','True positives \u00F7 All actual COPD cases'],
-  specificity:['Screening specificity','True negative rate: what percentage of non-COPD patients the screening correctly clears. Lower specificity means more false alarms \u2192 wasted spirometry \u2192 potential physician distrust.','1 \u2212 (False positives \u00F7 All non-COPD patients)'],
+  specificity:['Screening specificity','True negative rate: what percentage of non-COPD patients the screening correctly clears. THIS IS THE BIGGEST COST DRIVER. At 80% specificity with population-level screening, thousands of false positives generate spirometry referrals. Each 5% improvement in specificity saves ~\u20AC140k/yr in avoided spirometries. The system\u2019s scoring threshold should be tuned to control false positive volume.','1 \u2212 (False positives \u00F7 All non-COPD patients)'],
   physicianEngagement:['Physician engagement','Of all flagged patients, what percentage actually get a spirometry referral from the doctor. This is the single most uncertain and highest-impact variable. Alert fatigue, trust in the system, and flag placement in the EHR all affect this.','Spirometry ordered \u00F7 Flags shown to doctor'],
   devCost:['Development cost','One-time investment: platform build (form engine, scoring, voice ML), Apotti FHIR R4 integration, clinical validation. Does NOT include full MDR Class IIa certification \u2014 if PUHELU is classified as a medical device, add \u20AC80\u2013200k and 6\u201318 months.','Software: ~\u20AC80\u2013100k. Integration: ~\u20AC35\u201360k. Validation: ~\u20AC40\u201370k.'],
   opsCost:['Annual operations','Yearly cost: full-stack developer (~\u20AC55\u201370k loaded), part-time PM/clinical liaison (~\u20AC30\u201340k), hosting/infra (~\u20AC15\u201320k), data analysis (~\u20AC15\u201325k). \u20AC140k is a realistic baseline for a staffed operation.','Dev + PM + infra + analysis'],
@@ -549,7 +549,13 @@ function renderCashflow(r){
 
   var dTr=document.createElement('tr');var dL=document.createElement('td');dL.textContent='New diagnoses';dL.style.color='var(--muted)';dL.style.fontFamily='var(--font-heading)';dL.style.fontSize='12px';dTr.appendChild(dL);
   r.years.forEach(function(y){var td=document.createElement('td');td.className='num';td.textContent=y.yearDx;dTr.appendChild(td);});
-  var dT=document.createElement('td');dT.className='num';dT.style.fontWeight='600';dT.textContent=r.cumDx;dTr.appendChild(dT);el.appendChild(dTr);}
+  var dT=document.createElement('td');dT.className='num';dT.style.fontWeight='600';dT.textContent=r.cumDx;dTr.appendChild(dT);el.appendChild(dTr);
+
+  // Expansion phase row
+  var eTr=document.createElement('tr');var eL=document.createElement('td');eL.textContent='Coverage';eL.style.color='var(--muted)';eL.style.fontFamily='var(--font-heading)';eL.style.fontSize='12px';eTr.appendChild(eL);
+  var phases=['Helsinki','Helsinki','+Lifecare','National','National'];
+  r.years.forEach(function(y,i){var td=document.createElement('td');td.className='num';td.style.color='var(--muted)';td.style.fontSize='10px';td.textContent=phases[i]+(y.multiplier>1?' ('+y.multiplier.toFixed(1)+'\u00D7)':'');eTr.appendChild(td);});
+  eTr.appendChild(document.createElement('td'));el.appendChild(eTr);}
 
 function renderChart(r){
   var canvas=document.getElementById('chart');var dpr=window.devicePixelRatio||1;var rect=canvas.getBoundingClientRect();canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);var W=rect.width,H=rect.height;ctx.clearRect(0,0,W,H);
@@ -661,7 +667,7 @@ function renderDualPanels(r){
     pharmaEl.appendChild(pm);
 
     var pbul=document.createElement('ul');pbul.className='side-bullets';
-    ['Real-world evidence for respiratory portfolio','Replicable model for 30+ EU markets','12% weighted market share (GOLD A/B \u2192 ICS escalation)','Addressable market: '+fmt(r.cumDx)+' new patients identified','Disease awareness + health system partnership'
+    ['RWE: validated screening cohort for HTA submissions','HEOR data for payer negotiations across EU markets','Market shaping: '+fmt(r.cumDx)+' newly diagnosed = expanded addressable population','Replicable model for 30+ EU markets (all FHIR-capable)','Health system partnership at county level','Unbranded, disease-centric, HCP-initiated (EFPIA/PIF compliant)'
     ].forEach(function(t){var li=document.createElement('li');li.textContent=t;pbul.appendChild(li);});
     pharmaEl.appendChild(pbul);
 
