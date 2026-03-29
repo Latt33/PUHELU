@@ -240,7 +240,7 @@ var CONSTANTS={
   uniquePatients:90000,         // unique smoking-exposed patients visiting Apotti primary care/yr. Apotti PRIMARY CARE covers ~970k (Helsinki 684k + Vantaa 245k + Kerava 40k) — NOT 1.7M (that includes HUS specialist care). 970k × 30% smoking × ~75% visit public PC (Helsinki lower due to occupational health) ÷ 2.5 visits = ~87k, rounded to 90k. ~20% of smoking-exposed adults never visit (avoidance, shame, distrust).
   visitsPerYear:2.5,            // SCHEDULED primary care doctor appointments generating SMS. Eurostat 4.4 total → ~2.6-3.1 GP only → Helsinki 25-30% lower → ~2.0-2.2 → smokers 1.5× higher → ~3.0 → minus acute/walk-in/phone (no SMS) → ~2.5
   smsDelivery:0.92,             // SMS delivery rate
-  undiagnosedFraction:0.70,     // Diab et al., AJRCCM 2018: 70-80% globally. OLIN (Sweden): 50-70%. Hvidsten (Norway): 70%. Old Finnish estimate (Kotaniemi 2005): 49% — outdated and most conservative available
+  undiagnosedFraction:0.60,     // Finnish midpoint: Kotaniemi 2005 (49%) is floor, Diab 2018 (70-80%) is global. Finland has better primary care than global avg but still significant underdiagnosis. 60% balances Finnish-specific and international evidence.
   spirometryConfirmation:0.80,  // spirometry confirms COPD in true-positive referrals
   spirometryCost:154,           // EUR per spirometry: 110 × 1.4 inflation adj from 2010 to 2024 (Viinanen 2019 base)
   acuteCarePerPatient:713,      // EUR/yr: (450+59) × 1.4 inflation adj from 2010 to 2024. Cross-check: ARCTIC study (Lisspers 2018) found €1,278/yr — our figure is still conservative
@@ -389,17 +389,16 @@ function calc(v){
     // and fewer exacerbations. Savings ramp from Year 1 (cessation takes time to show effect).
     var cessRamp=y===0?0:Math.min(y/2,1); // half effect Y1, full from Y2
     var savC=Math.round(cumDx*C.smokingCessationRate*C.cessationSavingsPerPatient*cessRamp*disc);
-    // savD: Societal savings (productivity, disability, caregiving) — not in county healthcare budget
-    // but real economic value. Modelled as multiplier of direct healthcare savings.
+    // savD: Societal savings (productivity, disability, caregiving) — NOT in county healthcare budget.
+    // Shown separately for policymakers. NOT included in county ROI or payback calculations.
     var directSavings=savA+savB+savC;
-    var savD=Math.round(directSavings*(C.societalCostMultiplier-1)); // the ADDITIONAL societal portion
-    var savings=directSavings+savD;
+    var savD=Math.round(directSavings*(C.societalCostMultiplier-1));
+    var savings=directSavings; // ROI based on direct healthcare savings only
 
     // Store both nominal and PV for each year
-    var directNominal=Math.round(treated*C.acuteCarePerPatient*acuteRamp*C.adherence)
+    var savingsNominal=Math.round(treated*C.acuteCarePerPatient*acuteRamp*C.adherence)
       +Math.round(cumDx*C.copdSpecificDelta*C.progressionRate*progRamp*C.adherence)
       +Math.round(cumDx*C.smokingCessationRate*C.cessationSavingsPerPatient*cessRamp);
-    var savingsNominal=Math.round(directNominal*C.societalCostMultiplier);
     cumCostPV+=costsPV;cumSavingsPV+=savings;
     years.push({year:y,yearDx:yearDx,cumDx:cumDx,treated:Math.round(treated),
       devCost:y===0?Math.round(devCost*disc):0,opsCost:Math.round(scaledOps*disc),
@@ -638,9 +637,8 @@ function renderDualPanels(r){
   // COUNTY PANEL — full width
   countyEl.textContent='';
   var ch=document.createElement('div');ch.className='side-header';
-  var ctag=document.createElement('span');ctag.className='tag tag-county';ctag.textContent='PUBLIC';
-  var ch3=document.createElement('h3');ch3.textContent='Wellbeing County (Helsinki \u00B7 Vantaa \u00B7 Kerava)';
-  ch.appendChild(ctag);ch.appendChild(ch3);countyEl.appendChild(ch);
+  var ch3=document.createElement('h3');ch3.textContent='HUS-yhtym\u00E4';
+  ch.appendChild(ch3);countyEl.appendChild(ch);
 
   var ci=document.createElement('div');ci.className='side-invest';
   var camt=document.createElement('div');camt.className='amount';camt.style.color='var(--blue)';
