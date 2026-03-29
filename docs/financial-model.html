@@ -837,10 +837,10 @@ window.addEventListener('resize',function(){var r=calc(currentValues);renderChar
   </div>
 
   <div class="panel" style="margin-bottom:14px;">
-    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">6. QALY per diagnosis: 1.0 &rarr; 0.5</h2>
-    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> 1.0 QALY per early diagnosis, based on 5 years earlier detection &times; 0.2 QALY/year.</p>
-    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> Literature central estimate is ~0.25 QALY/detected case (Lambe 2019, Jordan 2014). 0.5 is at the optimistic end (Lokke 2012, TLV Sweden), defensible only for Stage I detection with maximum lead time.</p>
-    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Base case now uses 0.5 QALY. This is optimistic but defensible given PUHELU targets early-stage detection (5&ndash;7 year lead time). The cost/QALY metric doubled as a result, but remains well within Finnish thresholds (&euro;30,000&ndash;50,000/QALY).</p>
+    <h2 style="color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;">6. QALY per diagnosis: 1.0 &rarr; 0.3</h2>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Original:</strong> 1.0 QALY per early diagnosis, based on unsourced &ldquo;5 years earlier &times; 0.2 QALY/year.&rdquo;</p>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px;"><strong style="color:var(--text);">Problem:</strong> Source verification found original citations were fabricated (Lokke 2012, Jordan 2014 Thorax, TLV Sweden &mdash; none exist as cited). Verified source: Lambe et al. (Thorax 2019, PMC6703126): 0.028 QALY/screened patient &divide; 8.8% prevalence = ~0.32/detected case.</p>
+    <p style="font-size:13px;color:var(--dim);"><strong style="color:var(--text);">Fix:</strong> Lowered to 0.3 QALY/detected case. Conservative relative to the 0.32 derivation, accounting for cases that would have been diagnosed through usual care anyway. Cost/QALY metric increased ~3.3&times; from original but remains well below Finnish threshold (&euro;30,000&ndash;50,000/QALY).</p>
   </div>
 
   <div class="panel" style="margin-bottom:14px;">
